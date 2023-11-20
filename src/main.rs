@@ -1,7 +1,7 @@
 use sdl2::{pixels::Color, render::Canvas};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use sdl2::rect::Rect;
+use sdl2::rect::{Rect, Point};
 use sdl2::video::Window;
 use std::time::Instant;
 
@@ -142,6 +142,19 @@ impl Game {
         self.canvas.set_draw_color(color);
         self.canvas.clear();
         self.canvas.set_draw_color(Color::BLACK);
+
+        for i in 0..GRID_HEIGHT {
+            self.canvas.draw_line(
+                Point::new(0, (i * CELL_HEIGHT + 10) as i32),
+                Point::new(WINDOW_WIDTH as i32, (i * CELL_HEIGHT + 10) as i32)
+            ).expect("could not draw line");
+        }
+        for i in 0..GRID_WIDTH {
+            self.canvas.draw_line(
+                Point::new((i * CELL_WIDTH) as i32, 0),
+                Point::new((i * CELL_WIDTH) as i32, WINDOW_HEIGHT as i32)
+            ).expect("could not draw line");
+        }
 
         for i in 0..GRID_SIZE {
             match &state.grid[i as usize] {
