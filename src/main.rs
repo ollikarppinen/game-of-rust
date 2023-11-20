@@ -63,7 +63,8 @@ pub struct Game {
     event_pump: sdl2::EventPump,
     frame_count: u8,
     state_update: f32,
-    running: bool
+    running: bool,
+    paused: bool
 }
 
 impl Game {
@@ -73,7 +74,8 @@ impl Game {
             event_pump: event_pump,
             frame_count: 0,
             state_update: 0.0,
-            running: true
+            running: true,
+            paused: false
         }
     }
 
@@ -84,7 +86,10 @@ impl Game {
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     self.running = false;
                 },
-                Event::MouseMotion { x, y, ..} |
+                Event::KeyDown { keycode: Some(Keycode::Space), .. } => {
+                    self.paused = !self.paused;
+                },
+                // Event::MouseMotion { x, y, ..} |
                 Event::MouseButtonDown { x, y, .. } => {
                     let grid_x = x / CELL_WIDTH as i32;
                     let grid_y = y / CELL_HEIGHT as i32;
@@ -101,7 +106,7 @@ impl Game {
 
         self.frame_count = (self.frame_count + 1) % 255;
 
-        if t - self.state_update < MS_PER_STATE_UPDATE { return state }
+        if self.paused || t - self.state_update < MS_PER_STATE_UPDATE { return state }
 
         self.state_update = t;
 
