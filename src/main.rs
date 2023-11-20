@@ -5,13 +5,14 @@ use sdl2::rect::Rect;
 use sdl2::video::Window;
 use std::time::Instant;
 
-const MS_PER_UPDATE: f32 = 16.0;
+const MS_PER_UPDATE: f32 = 4.0;
+const MS_PER_STATE_UPDATE: f32 = 200.0;
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
 const CELL_WIDTH: u32 = 10;
 const CELL_HEIGHT: u32 = 10;
-const GRID_WIDTH: u32 = WINDOW_WIDTH / CELL_WIDTH;
-const GRID_HEIGHT: u32 = WINDOW_HEIGHT / CELL_HEIGHT;
+const GRID_WIDTH: u32 = WINDOW_WIDTH / CELL_WIDTH; // 80
+const GRID_HEIGHT: u32 = WINDOW_HEIGHT / CELL_HEIGHT; // 60
 const GRID_SIZE: u32 = GRID_WIDTH * GRID_HEIGHT;
 #[derive(Debug)]
 pub struct TimeStep {
@@ -61,10 +62,7 @@ pub struct Game {
     canvas: Canvas<Window>,
     event_pump: sdl2::EventPump,
     frame_count: u8,
-    rect_x: i32,
-    rect_y: i32,
-    rect_xd: i32,
-    rect_yd: i32,
+    state_update: f32,
     running: bool
 }
 
@@ -74,21 +72,19 @@ impl Game {
             canvas: canvas,
             event_pump: event_pump,
             frame_count: 0,
-            rect_x: 350,
-            rect_y: 250,
-            rect_xd: 1,
-            rect_yd: 1,
+            state_update: 0.0,
             running: true
         }
     }
 
-    pub fn update(&mut self, mut state: State, t: f32, dt: f32) -> State {
+    pub fn update(&mut self, mut state: State, t: f32, _dt: f32) -> State {
         for event in self.event_pump.poll_iter() {
             match event {
                 Event::Quit { ..  } |
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     self.running = false;
                 },
+                Event::MouseMotion { x, y, ..} |
                 Event::MouseButtonDown { x, y, .. } => {
                     let grid_x = x / CELL_WIDTH as i32;
                     let grid_y = y / CELL_HEIGHT as i32;
@@ -105,20 +101,39 @@ impl Game {
 
         self.frame_count = (self.frame_count + 1) % 255;
 
-        self.rect_x = self.rect_x + self.rect_xd;
-        self.rect_y = self.rect_y + self.rect_yd;
+        if t - self.state_update < MS_PER_STATE_UPDATE { return state }
 
-        if self.rect_x <= 0 { self.rect_xd = 1; }
-        if self.rect_y <= 0 { self.rect_yd = 1; }
+        self.state_update = t;
 
-        if self.rect_x >= 790 { self.rect_xd = -1; }
-        if self.rect_y >= 590 { self.rect_yd = -1; }
+        let mut new_state = State::new();
 
-        state
+        for i in 0..GRID_SIZE {
+            match &state.grid[i as usize] {
+                Some(_) => {
+                    match &state.neighbor_count(i as i32) {
+                        2 |
+                        3 => {
+                            new_state.grid[i as usize] = Some(Box::new(Cell::new(t)))
+                        },
+                        _ => {}
+                    }
+                },
+                None => {
+                    match &state.neighbor_count(i as i32) {
+                        3 => {
+                            new_state.grid[i as usize] = Some(Box::new(Cell::new(t)))
+                        },
+                        _ => {}
+                    }
+                }
+            }
+        }
+
+        new_state
     }
 
     pub fn render(&mut self, state: &State) {
-        let color = Color::RGB(self.frame_count, 64, 255 - self.frame_count);
+        let color = Color::WHITE;
         self.canvas.set_draw_color(color);
         self.canvas.clear();
         self.canvas.set_draw_color(Color::BLACK);
@@ -133,7 +148,6 @@ impl Game {
                 None => {}
             }
         }
-        self.canvas.fill_rect(Rect::new(self.rect_x, self.rect_y, 10, 10)).expect("could not fill rect");
         self.canvas.present();
     }
 }
@@ -160,6 +174,45 @@ impl State {
             grid: std::array::from_fn(|_| None)
         }
     }
+
+    pub fn neighbor_count(&self, i: i32) -> u8 {
+        let mut count = 0;
+
+        let _grid_size = GRID_SIZE as i32;
+        let grid_width = GRID_WIDTH as i32;
+        let grid_height = GRID_HEIGHT as i32;
+
+        let top = i / grid_width == 0;
+        let bottom = i / grid_width >= grid_height - 1;
+        let left = i % grid_width == 0;
+        let right = i % grid_width >= grid_width - 1;
+
+        let mut ii = i - 1;
+        if !left && self.grid[ii as usize].is_some() { count += 1 }
+
+        ii = i + 1;
+        if !right && self.grid[ii as usize].is_some() { count += 1 }
+
+        ii = i - grid_width - 1;
+        if !top && !left && self.grid[ii as usize].is_some() { count += 1 }
+
+        ii = i - grid_width;
+        if !top && self.grid[ii as usize].is_some() { count += 1 }
+
+        ii = i - grid_width + 1;
+        if !top && !right && self.grid[ii as usize].is_some() { count += 1 }
+
+        ii = i + grid_width - 1;
+        if !bottom && !left && self.grid[ii as usize].is_some() { count += 1 }
+
+        ii = i + grid_width;
+        if !bottom && self.grid[ii as usize].is_some() { count += 1 }
+
+        ii = i + grid_width + 1;
+        if !bottom && !right && self.grid[ii as usize].is_some() { count += 1 }
+
+        count
+    }
 }
 
 fn main() -> Result<(), String> {
@@ -184,6 +237,9 @@ fn main() -> Result<(), String> {
     let mut timestep = TimeStep::new();
     let mut accumulator = 0.0;
     let mut state = State::new();
+    state.grid[1255] = Some(Box::new(Cell::new(t)));
+    state.grid[1256] = Some(Box::new(Cell::new(t)));
+    state.grid[1257] = Some(Box::new(Cell::new(t)));
 
     while game.running {
         let frame_time = timestep.delta();
