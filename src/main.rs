@@ -97,8 +97,12 @@ impl Game {
                     println!("Mouse clicked at: {}, {}", x, y);
                     println!("Grid at: {}, {}", grid_x, grid_y);
                     println!("Grid i: {}", grid_i);
-                    let cell = Cell::new(t);
-                    state.grid[grid_i as usize] = Some(Box::new(cell))
+
+                    state.grid[grid_i as usize] = if state.grid[grid_i as usize].is_none() {
+                        Some(Box::new(Cell::new(t)))
+                    } else {
+                        None
+                    }
                 },
                 _ => {}
             }
