@@ -71,7 +71,7 @@ impl Game {
         }
     }
 
-    pub fn update(&mut self, t: f32) {
+    pub fn update(&mut self, t: f32, dt: f32) {
         self.frame_count = (self.frame_count + 1) % 255;
 
         self.rect_x = self.rect_x + self.rect_xd;
@@ -85,6 +85,7 @@ impl Game {
     }
 
     pub fn render(&mut self) {
+        // println!("Render! Frame count: {}", self.frame_count);
         let color = Color::RGB(self.frame_count, 64, 255 - self.frame_count);
         self.canvas.set_draw_color(color);
         self.canvas.clear();
@@ -108,11 +109,19 @@ fn main() -> Result<(), String> {
 
     let mut event_pump: sdl2::EventPump = sdl_context.event_pump()?;
 
-    let mut timestep = TimeStep::new();
     let mut game = Game::new(canvas);
-    let mut lag = 0.0;
+
+    // https://gafferongames.com/post/fix_your_timestep/
+    let mut t: f32 = 0.0;
+    let dt: f32 = 1.0 / 60.0 * 1_000.0;
+
+    let mut timestep = TimeStep::new();
+    let mut accumulator = 0.0;
 
     'running: loop {
+        let frame_time = timestep.delta();
+        accumulator += frame_time;
+
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit { ..  } |
@@ -123,11 +132,18 @@ fn main() -> Result<(), String> {
             }
         }
 
-        lag += timestep.delta();
-        while lag >= MS_PER_UPDATE {
-            game.update(MS_PER_UPDATE * 0.01);
-            lag -= MS_PER_UPDATE;
+        while accumulator >= MS_PER_UPDATE {
+            game.update(t, MS_PER_UPDATE);
+            t += MS_PER_UPDATE;
+            accumulator -= MS_PER_UPDATE;
         }
+
+        // const double alpha = accumulator / dt;
+
+        // State state = currentState * alpha +
+        //     previousState * ( 1.0 - alpha );
+
+        // render( state );
 
         game.render();
     }
