@@ -1,6 +1,6 @@
 use sdl2::{pixels::Color, render::Canvas};
 use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
+use sdl2::keyboard::{Keycode, self};
 use sdl2::rect::{Rect, Point};
 use sdl2::video::Window;
 use std::time::Instant;
@@ -86,6 +86,19 @@ impl Game {
     }
 
     pub fn update(&mut self, mut state: State, t: f32, _dt: f32) -> State {
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) {
+            self.offset_y -= 10;
+        }
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) {
+            self.offset_y += 10;
+        }
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) {
+            self.offset_x += 10;
+        }
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) {
+            self.offset_x -= 10;
+        }
+
         for event in self.event_pump.poll_iter() {
             match event {
                 Event::Quit { ..  } |
@@ -94,22 +107,6 @@ impl Game {
                 },
                 Event::KeyDown { keycode: Some(Keycode::Space), .. } => {
                     self.paused = !self.paused;
-                },
-                Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
-                    self.offset_y += 10;
-                    // self.ms_per_state_update = self.ms_per_state_update - 100.0;
-                },
-                Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
-                    self.offset_y -= 10;
-                    // self.ms_per_state_update = self.ms_per_state_update + 100.0;
-                },
-                Event::KeyDown { keycode: Some(Keycode::Left), .. } => {
-                    self.offset_x += 10;
-                    // self.ms_per_state_update = self.ms_per_state_update - 100.0;
-                },
-                Event::KeyDown { keycode: Some(Keycode::Right), .. } => {
-                    self.offset_x -= 10;
-                    // self.ms_per_state_update = self.ms_per_state_update + 100.0;
                 },
                 Event::KeyDown { keycode: Some(Keycode::Plus), .. } => {
                     if self.ms_per_state_update > 0.0 { self.ms_per_state_update -= 100.0 }
