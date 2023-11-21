@@ -97,7 +97,9 @@ impl Game {
                 Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
                     self.ms_per_state_update = self.ms_per_state_update + 100.0;
                 },
-                // Event::MouseMotion { x, y, ..} |
+                Event::KeyDown { keycode: Some(Keycode::C), .. } => {
+                    state.reset();
+                },
                 Event::MouseButtonDown { x, y, .. } => {
                     let grid_x = x / CELL_WIDTH as i32;
                     let grid_y = y / CELL_HEIGHT as i32;
@@ -199,6 +201,10 @@ impl State {
         State {
             grid: std::array::from_fn(|_| None)
         }
+    }
+
+    pub fn reset(&mut self) {
+        self.grid = std::array::from_fn(|_| None);
     }
 
     pub fn neighbor_count(&self, i: i32) -> u8 {
