@@ -86,17 +86,17 @@ impl Game {
     }
 
     pub fn update(&mut self, mut state: State, t: f32, _dt: f32) -> State {
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) {
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) && self.offset_y > -500 {
             self.offset_y -= 10;
         }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) {
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) && self.offset_y < 500 {
             self.offset_y += 10;
         }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) {
-            self.offset_x += 10;
-        }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) {
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) && self.offset_x > -500 {
             self.offset_x -= 10;
+        }
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) && self.offset_x < 500 {
+            self.offset_x += 10;
         }
 
         for event in self.event_pump.poll_iter() {
