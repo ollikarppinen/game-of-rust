@@ -174,6 +174,15 @@ impl Game {
         self.canvas.clear();
         self.canvas.set_draw_color(Color::BLACK);
 
+        self.canvas.draw_line(
+            Point::new(self.offset_x, self.offset_y),
+            Point::new(WINDOW_WIDTH as i32 + self.offset_x, self.offset_y)
+        ).expect("could not draw line");
+        self.canvas.draw_line(
+            Point::new(WINDOW_WIDTH as i32 + self.offset_x, self.offset_y),
+            Point::new(WINDOW_WIDTH as i32 + self.offset_x, WINDOW_HEIGHT as i32 + self.offset_y)
+        ).expect("could not draw line");
+
         for i in 0..GRID_HEIGHT {
             self.canvas.draw_line(
                 Point::new(self.offset_x, (i * CELL_HEIGHT + 10) as i32 + self.offset_y),
