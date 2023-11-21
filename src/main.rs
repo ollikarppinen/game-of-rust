@@ -46,7 +46,7 @@ impl TimeStep {
     pub fn frame_rate(&mut self) -> Option<u32> {
         self.frame_count += 1;
         self.frame_time += self.delta_time;
-        let tmp;
+        let tmp: u32;
         // per second
         if self.frame_time >= 1000.0 {
             tmp = self.frame_count;
@@ -99,7 +99,7 @@ impl Game {
                     println!("Grid i: {}", grid_i);
 
                     state.grid[grid_i as usize] = if state.grid[grid_i as usize].is_none() {
-                        Some(Box::new(Cell::new(t)))
+                        Some(Box::new(Cell::new()))
                     } else {
                         None
                     }
@@ -122,7 +122,7 @@ impl Game {
                     match &state.neighbor_count(i as i32) {
                         2 |
                         3 => {
-                            new_state.grid[i as usize] = Some(Box::new(Cell::new(t)))
+                            new_state.grid[i as usize] = Some(Box::new(Cell::new()))
                         },
                         _ => {}
                     }
@@ -130,7 +130,7 @@ impl Game {
                 None => {
                     match &state.neighbor_count(i as i32) {
                         3 => {
-                            new_state.grid[i as usize] = Some(Box::new(Cell::new(t)))
+                            new_state.grid[i as usize] = Some(Box::new(Cell::new()))
                         },
                         _ => {}
                     }
@@ -174,15 +174,11 @@ impl Game {
     }
 }
 
-pub struct Cell {
-    created_at: f32
-}
+pub struct Cell {}
 
 impl Cell {
-    pub fn new(t: f32) -> Cell {
-        Cell {
-            created_at: t
-        }
+    pub fn new() -> Cell {
+        Cell {}
     }
 }
 
@@ -245,7 +241,6 @@ fn main() -> Result<(), String> {
         .position_centered()
         .build()
         .expect("could not initialize video subsystem");
-
     let canvas = window.into_canvas().build()
         .expect("could not make a canvas");
 
@@ -259,9 +254,9 @@ fn main() -> Result<(), String> {
     let mut timestep = TimeStep::new();
     let mut accumulator = 0.0;
     let mut state = State::new();
-    state.grid[1255] = Some(Box::new(Cell::new(t)));
-    state.grid[1256] = Some(Box::new(Cell::new(t)));
-    state.grid[1257] = Some(Box::new(Cell::new(t)));
+    state.grid[1255] = Some(Box::new(Cell::new()));
+    state.grid[1256] = Some(Box::new(Cell::new()));
+    state.grid[1257] = Some(Box::new(Cell::new()));
 
     while game.running {
         let frame_time = timestep.delta();
