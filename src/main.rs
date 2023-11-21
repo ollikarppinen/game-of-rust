@@ -111,6 +111,12 @@ impl Game {
                     self.offset_x -= 10;
                     // self.ms_per_state_update = self.ms_per_state_update + 100.0;
                 },
+                Event::KeyDown { keycode: Some(Keycode::Plus), .. } => {
+                    if self.ms_per_state_update > 0.0 { self.ms_per_state_update -= 100.0 }
+                },
+                Event::KeyDown { keycode: Some(Keycode::Minus), .. } => {
+                    if self.ms_per_state_update < 1000.0 { self.ms_per_state_update += 100.0;}
+                },
                 Event::KeyDown { keycode: Some(Keycode::C), .. } => {
                     state.reset();
                 },
