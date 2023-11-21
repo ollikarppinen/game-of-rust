@@ -65,7 +65,9 @@ pub struct Game {
     state_update: f32,
     running: bool,
     paused: bool,
-    ms_per_state_update: f32
+    ms_per_state_update: f32,
+    offset_x: i32,
+    offset_y: i32
 }
 
 impl Game {
@@ -77,7 +79,9 @@ impl Game {
             state_update: 0.0,
             running: true,
             paused: false,
-            ms_per_state_update: DEFAULT_MS_PER_STATE_UPDATE
+            ms_per_state_update: DEFAULT_MS_PER_STATE_UPDATE,
+            offset_x: 0,
+            offset_y: 0
         }
     }
 
@@ -92,17 +96,27 @@ impl Game {
                     self.paused = !self.paused;
                 },
                 Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
-                    self.ms_per_state_update = self.ms_per_state_update - 100.0;
+                    self.offset_y += 10;
+                    // self.ms_per_state_update = self.ms_per_state_update - 100.0;
                 },
                 Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
-                    self.ms_per_state_update = self.ms_per_state_update + 100.0;
+                    self.offset_y -= 10;
+                    // self.ms_per_state_update = self.ms_per_state_update + 100.0;
+                },
+                Event::KeyDown { keycode: Some(Keycode::Left), .. } => {
+                    self.offset_x += 10;
+                    // self.ms_per_state_update = self.ms_per_state_update - 100.0;
+                },
+                Event::KeyDown { keycode: Some(Keycode::Right), .. } => {
+                    self.offset_x -= 10;
+                    // self.ms_per_state_update = self.ms_per_state_update + 100.0;
                 },
                 Event::KeyDown { keycode: Some(Keycode::C), .. } => {
                     state.reset();
                 },
                 Event::MouseButtonDown { x, y, .. } => {
-                    let grid_x = x / CELL_WIDTH as i32;
-                    let grid_y = y / CELL_HEIGHT as i32;
+                    let grid_x = (x - self.offset_x) / CELL_WIDTH as i32;
+                    let grid_y = (y - self.offset_y) / CELL_HEIGHT as i32;
                     let grid_i = grid_x + grid_y * GRID_WIDTH as i32;
                     println!("Mouse clicked at: {}, {}", x, y);
                     println!("Grid at: {}, {}", grid_x, grid_y);
@@ -159,14 +173,14 @@ impl Game {
 
         for i in 0..GRID_HEIGHT {
             self.canvas.draw_line(
-                Point::new(0, (i * CELL_HEIGHT + 10) as i32),
-                Point::new(WINDOW_WIDTH as i32, (i * CELL_HEIGHT + 10) as i32)
+                Point::new(self.offset_x, (i * CELL_HEIGHT + 10) as i32 + self.offset_y),
+                Point::new(WINDOW_WIDTH as i32 + self.offset_x, (i * CELL_HEIGHT + 10) as i32 + self.offset_y)
             ).expect("could not draw line");
         }
         for i in 0..GRID_WIDTH {
             self.canvas.draw_line(
-                Point::new((i * CELL_WIDTH) as i32, 0),
-                Point::new((i * CELL_WIDTH) as i32, WINDOW_HEIGHT as i32)
+                Point::new((i * CELL_WIDTH)  as i32 + self.offset_x, self.offset_y),
+                Point::new((i * CELL_WIDTH) as i32 + self.offset_x, WINDOW_HEIGHT as i32 + self.offset_y)
             ).expect("could not draw line");
         }
 
@@ -175,7 +189,7 @@ impl Game {
                 Some(_) => {
                     let x = i % GRID_WIDTH * CELL_WIDTH;
                     let y = i / GRID_WIDTH * CELL_HEIGHT;
-                    self.canvas.fill_rect(Rect::new(x as i32, y as i32, CELL_WIDTH, CELL_HEIGHT)).expect("could not fill rect");
+                    self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, CELL_WIDTH, CELL_HEIGHT)).expect("could not fill rect");
                 },
                 None => {}
             }
@@ -183,6 +197,7 @@ impl Game {
         self.canvas.present();
     }
 }
+
 
 pub struct Cell {}
 
