@@ -6,7 +6,7 @@ use sdl2::video::Window;
 use std::time::Instant;
 
 const MS_PER_UPDATE: f32 = 4.0;
-const MS_PER_STATE_UPDATE: f32 = 200.0;
+const DEFAULT_MS_PER_STATE_UPDATE: f32 = 200.0;
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
 const CELL_WIDTH: u32 = 10;
@@ -64,7 +64,8 @@ pub struct Game {
     frame_count: u8,
     state_update: f32,
     running: bool,
-    paused: bool
+    paused: bool,
+    ms_per_state_update: f32
 }
 
 impl Game {
@@ -75,7 +76,8 @@ impl Game {
             frame_count: 0,
             state_update: 0.0,
             running: true,
-            paused: false
+            paused: false,
+            ms_per_state_update: DEFAULT_MS_PER_STATE_UPDATE
         }
     }
 
@@ -88,6 +90,12 @@ impl Game {
                 },
                 Event::KeyDown { keycode: Some(Keycode::Space), .. } => {
                     self.paused = !self.paused;
+                },
+                Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
+                    self.ms_per_state_update = self.ms_per_state_update - 100.0;
+                },
+                Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
+                    self.ms_per_state_update = self.ms_per_state_update + 100.0;
                 },
                 // Event::MouseMotion { x, y, ..} |
                 Event::MouseButtonDown { x, y, .. } => {
@@ -110,7 +118,7 @@ impl Game {
 
         self.frame_count = (self.frame_count + 1) % 255;
 
-        if self.paused || t - self.state_update < MS_PER_STATE_UPDATE { return state }
+        if self.paused || t - self.state_update < self.ms_per_state_update { return state }
 
         self.state_update = t;
 
