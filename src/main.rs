@@ -118,18 +118,23 @@ impl Game {
                     state.reset();
                 },
                 Event::MouseButtonDown { x, y, .. } => {
-                    let grid_x = (x - self.offset_x) / CELL_WIDTH as i32;
-                    let grid_y = (y - self.offset_y) / CELL_HEIGHT as i32;
-                    let grid_i = grid_x + grid_y * GRID_WIDTH as i32;
-                    println!("Mouse clicked at: {}, {}", x, y);
-                    println!("Grid at: {}, {}", grid_x, grid_y);
-                    println!("Grid i: {}", grid_i);
+                    let x_with_offset = x - self.offset_x;
+                    let y_with_offset = y - self.offset_y;
 
-                    state.grid[grid_i as usize] = if state.grid[grid_i as usize].is_none() {
-                        Some(Box::new(Cell::new()))
-                    } else {
-                        None
+                    if x_with_offset >= 0 && y_with_offset >= 0 && x_with_offset < WINDOW_WIDTH as i32 && y_with_offset < WINDOW_HEIGHT as i32 {
+                        println!("Mouse clicked at: {}, {}", x, y);
+                        let grid_x = x_with_offset / CELL_WIDTH as i32;
+                        let grid_y = y_with_offset / CELL_HEIGHT as i32;
+                        let grid_i = grid_x + grid_y * GRID_WIDTH as i32;
+                        state.grid[grid_i as usize] = if state.grid[grid_i as usize].is_none() {
+                            Some(Box::new(Cell::new()))
+                        } else {
+                            None
+                        }
                     }
+                    // println!("Grid at: {}, {}", grid_x, grid_y);
+                    // println!("Grid i: {}", grid_i);
+
                 },
                 _ => {}
             }
