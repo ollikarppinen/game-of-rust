@@ -114,28 +114,27 @@ impl Game {
                 Event::KeyDown { keycode: Some(Keycode::Minus), .. } => {
                     if self.ms_per_state_update < 1000.0 { self.ms_per_state_update += 100.0;}
                 },
-                Event::KeyDown { keycode: Some(Keycode::C), .. } => {
+                Event::KeyDown { keycode: Some(Keycode::R), .. } => {
                     state.reset();
                 },
                 Event::MouseButtonDown { x, y, .. } => {
-                    let x_with_offset = x - self.offset_x;
-                    let y_with_offset = y - self.offset_y;
-
-                    if x_with_offset >= 0 && y_with_offset >= 0 && x_with_offset < WINDOW_WIDTH as i32 && y_with_offset < WINDOW_HEIGHT as i32 {
-                        println!("Mouse clicked at: {}, {}", x, y);
-                        let grid_x = x_with_offset / CELL_WIDTH as i32;
-                        let grid_y = y_with_offset / CELL_HEIGHT as i32;
-                        let grid_i = grid_x + grid_y * GRID_WIDTH as i32;
-                        state.grid[grid_i as usize] = if state.grid[grid_i as usize].is_none() {
-                            Some(Box::new(Cell::new()))
-                        } else {
-                            None
-                        }
+                    let grid_i = Game::get_grid_i(x, y, self.offset_x, self.offset_y);
+                    match &grid_i {
+                        Some(i) => {
+                            state.grid[*i] = Some(Cell::new(Some(t), None));
+                        },
+                        _ => {}
                     }
-                    // println!("Grid at: {}, {}", grid_x, grid_y);
-                    // println!("Grid i: {}", grid_i);
-
                 },
+                Event::MouseMotion { x, y, .. } => {
+                    let grid_i = Game::get_grid_i(x, y, self.offset_x, self.offset_y);
+                    match &grid_i {
+                        Some(i) => {
+                            if !state.is_live(*i as i32) { state.grid[*i] = Some(Cell::new(None, Some(t))) }
+                        },
+                        _ => {}
+                    }
+                }
                 _ => {}
             }
         }
@@ -149,34 +148,37 @@ impl Game {
         let mut new_state = State::new();
 
         for i in 0..GRID_SIZE {
-            match &state.grid[i as usize] {
-                Some(_) => {
-                    match &state.neighbor_count(i as i32) {
-                        2 |
-                        3 => {
-                            new_state.grid[i as usize] = Some(Box::new(Cell::new()))
-                        },
-                        _ => {}
-                    }
-                },
-                None => {
-                    match &state.neighbor_count(i as i32) {
-                        3 => {
-                            new_state.grid[i as usize] = Some(Box::new(Cell::new()))
-                        },
-                        _ => {}
-                    }
-                }
-            }
+            new_state.grid[i as usize] = state.next(i as i32, t);
         }
 
         new_state
+    }
+
+    pub fn get_grid_i(x: i32, y: i32, offset_x: i32, offset_y: i32) -> Option<usize> {
+        let x_with_offset = x - offset_x;
+        let y_with_offset = y - offset_y;
+        if x_with_offset >= 0 && y_with_offset >= 0 && x_with_offset < WINDOW_WIDTH as i32 && y_with_offset < WINDOW_HEIGHT as i32 {
+            let grid_x = x_with_offset / CELL_WIDTH as i32;
+            let grid_y = y_with_offset / CELL_HEIGHT as i32;
+            let grid_i = grid_x + grid_y * GRID_WIDTH as i32;
+            return Some(grid_i as usize);
+        } else {
+            return None;
+        }
     }
 
     pub fn render(&mut self, state: &State) {
         let color = Color::WHITE;
         self.canvas.set_draw_color(color);
         self.canvas.clear();
+
+        self.render_state(state);
+        self.render_grid();
+
+        self.canvas.present();
+    }
+
+    fn render_grid(&mut self) {
         self.canvas.set_draw_color(Color::BLACK);
 
         self.canvas.draw_line(
@@ -200,32 +202,43 @@ impl Game {
                 Point::new((i * CELL_WIDTH) as i32 + self.offset_x, WINDOW_HEIGHT as i32 + self.offset_y)
             ).expect("could not draw line");
         }
+    }
 
+    fn render_state(&mut self, state: &State) {
         for i in 0..GRID_SIZE {
-            match &state.grid[i as usize] {
-                Some(_) => {
-                    let x = i % GRID_WIDTH * CELL_WIDTH;
-                    let y = i / GRID_WIDTH * CELL_HEIGHT;
-                    self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, CELL_WIDTH, CELL_HEIGHT)).expect("could not fill rect");
-                },
-                None => {}
+            if state.is_hover(i as i32) {
+                let x = i % GRID_WIDTH * CELL_WIDTH;
+                let y = i / GRID_WIDTH * CELL_HEIGHT;
+                self.canvas.set_draw_color(Color::GRAY);
+                self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, CELL_WIDTH, CELL_HEIGHT)).expect("could not fill rect");
+            }
+            if state.is_live(i as i32) {
+                let x = i % GRID_WIDTH * CELL_WIDTH;
+                let y = i / GRID_WIDTH * CELL_HEIGHT;
+                self.canvas.set_draw_color(Color::BLACK);
+                self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, CELL_WIDTH, CELL_HEIGHT)).expect("could not fill rect");
             }
         }
-        self.canvas.present();
     }
 }
 
 
-pub struct Cell {}
+pub struct Cell {
+    live: Option<f32>,
+    hover: Option<f32>
+}
 
 impl Cell {
-    pub fn new() -> Cell {
-        Cell {}
+    pub fn new(live: Option<f32>, hover: Option<f32>) -> Cell {
+        Cell {
+            live: live,
+            hover: hover
+        }
     }
 }
 
 pub struct State {
-    grid: [Option<Box<Cell>>; GRID_SIZE as usize]
+    grid: [Option<Cell>; GRID_SIZE as usize]
 }
 
 impl State {
@@ -237,6 +250,76 @@ impl State {
 
     pub fn reset(&mut self) {
         self.grid = std::array::from_fn(|_| None);
+    }
+
+    pub fn is_live(&self, i: i32) -> bool {
+        match &self.grid[i as usize] {
+            Some(Cell { live: Some(_), .. } ) => { true },
+            _ => { false }
+        }
+    }
+
+    pub fn is_hover(&self, i: i32) -> bool {
+        match &self.grid[i as usize] {
+            Some(Cell { hover: Some(_), .. } ) => { true },
+            _ => { false }
+        }
+    }
+
+    pub fn should_live(&self, i: i32) -> bool {
+        match self.neighbor_count(i) {
+            2 => { self.is_live(i) },
+            3 => { true },
+            _ => { false }
+        }
+    }
+
+    pub fn should_hover(&self, i: i32, t: f32) -> bool {
+        match &self.grid[i as usize] {
+            Some(Cell { hover: Some(hover_t), .. } ) => {
+                println!("t: {}, hover_t: {}", t, hover_t);
+                t - hover_t < 10.0
+            },
+            _ => { false }
+        }
+    }
+
+    pub fn get_live(&self, i: i32) -> Option<f32> {
+        match &self.grid[i as usize] {
+            Some(Cell { live: Some(t), .. } ) => {
+                return Some(*t);
+            },
+            _ => { None }
+        }
+    }
+
+    pub fn get_hover(&self, i: i32) -> Option<f32> {
+        match &self.grid[i as usize] {
+            Some(Cell { hover: Some(t), .. } ) => {
+                return Some(*t);
+            },
+            _ => { None }
+        }
+    }
+
+    pub fn next(&self, i: i32, t: f32) -> Option<Cell> {
+        if self.should_live(i) {
+            return Some(
+                Cell::new(
+                    self.get_live(i).or(Some(t)),
+                    None
+                )
+            );
+        } else if self.should_hover(i, t) {
+            return Some(
+                Cell::new(
+                    None,
+                    self.get_hover(i).or(Some(t))
+                )
+            );
+        } else {
+            None
+        }
     }
 
     pub fn neighbor_count(&self, i: i32) -> u8 {
@@ -252,28 +335,28 @@ impl State {
         let right = i % grid_width >= grid_width - 1;
 
         let mut ii = i - 1;
-        if !left && self.grid[ii as usize].is_some() { count += 1 }
+        if !left && self.is_live(ii){ count += 1 }
 
         ii = i + 1;
-        if !right && self.grid[ii as usize].is_some() { count += 1 }
+        if !right && self.is_live(ii) { count += 1 }
 
         ii = i - grid_width - 1;
-        if !top && !left && self.grid[ii as usize].is_some() { count += 1 }
+        if !top && !left && self.is_live(ii) { count += 1 }
 
         ii = i - grid_width;
-        if !top && self.grid[ii as usize].is_some() { count += 1 }
+        if !top && self.is_live(ii) { count += 1 }
 
         ii = i - grid_width + 1;
-        if !top && !right && self.grid[ii as usize].is_some() { count += 1 }
+        if !top && !right && self.is_live(ii) { count += 1 }
 
         ii = i + grid_width - 1;
-        if !bottom && !left && self.grid[ii as usize].is_some() { count += 1 }
+        if !bottom && !left && self.is_live(ii) { count += 1 }
 
         ii = i + grid_width;
-        if !bottom && self.grid[ii as usize].is_some() { count += 1 }
+        if !bottom && self.is_live(ii) { count += 1 }
 
         ii = i + grid_width + 1;
-        if !bottom && !right && self.grid[ii as usize].is_some() { count += 1 }
+        if !bottom && !right && self.is_live(ii) { count += 1 }
 
         count
     }
@@ -300,9 +383,11 @@ fn main() -> Result<(), String> {
     let mut timestep = TimeStep::new();
     let mut accumulator = 0.0;
     let mut state = State::new();
-    state.grid[1255] = Some(Box::new(Cell::new()));
-    state.grid[1256] = Some(Box::new(Cell::new()));
-    state.grid[1257] = Some(Box::new(Cell::new()));
+    state.grid[1255] = Some(Cell::new(Some(t), None));
+    state.grid[1256] = Some(Cell::new(Some(t), None));
+    state.grid[1257] = Some(Cell::new(Some(t), None));
+
+    state.grid[2222] = Some(Cell::new(None, Some(t)));
 
     while game.running {
         let frame_time = timestep.delta();
