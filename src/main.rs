@@ -152,6 +152,13 @@ impl Game {
                     let grid_i = Game::get_grid_i(x - self.offset_x, y - self.offset_y, &self.config);
                     match &grid_i {
                         Some(i) => {
+                            println!("mouse button down, i: {}", i);
+
+                            match state.game_grid[*i] {
+                                Some(_) => {
+                                    state.game_grid[*i] = None;
+                                },
+                                None => {
                             state.game_grid[*i] = Some(Cell::new(Some(t)));
                         },
                         _ => {}
