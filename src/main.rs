@@ -126,13 +126,6 @@ impl Game {
             self.offset_x += 10;
         }
 
-        match Game::get_grid_i(self.event_pump.mouse_state().x(), self.event_pump.mouse_state().y(), self.offset_x, self.offset_y) {
-            Some(i) => {
-                if !state.is_live(i as i32) { state.game_grid[i] = Some(Cell::new(None, Some(t))) }
-            },
-            None => {}
-        };
-
         for event in self.event_pump.poll_iter() {
             match event {
                 Event::Quit { ..  } |
@@ -205,6 +198,7 @@ impl Game {
         self.canvas.set_draw_color(color);
         self.canvas.clear();
 
+        self.render_hover();
         self.render_state(state);
         self.render_grid();
 
@@ -239,33 +233,47 @@ impl Game {
 
     fn render_state(&mut self, state: &State) {
         for i in 0..GRID_SIZE {
-            if state.is_hover(i as i32) {
-                let x = i % self.config.grid_width * self.config.cell_width;
-                let y = i / self.config.grid_width * self.config.cell_height;
-                self.canvas.set_draw_color(Color::GRAY);
-                self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, self.config.cell_width, self.config.cell_height)).expect("could not fill rect");
-            }
             if state.is_live(i as i32) {
                 let x = i % self.config.grid_width * self.config.cell_width;
                 let y = i / self.config.grid_width * self.config.cell_height;
-                self.canvas.set_draw_color(Color::BLACK);
-                self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, self.config.cell_width, self.config.cell_height)).expect("could not fill rect");
+                self.render_live_cell(i);
             }
         }
+    }
+
+    fn render_hover(&mut self) {
+        match Game::get_grid_i(self.event_pump.mouse_state().x(), self.event_pump.mouse_state().y(), self.offset_x, self.offset_y) {
+            Some(i) => {
+                self.render_hover_cell(i as u32);
+            },
+            None => {}
+        };
+    }
+
+    fn render_live_cell(&mut self, i: u32) {
+        let x = i % self.config.grid_width * self.config.cell_width;
+        let y = i / self.config.grid_width * self.config.cell_height;
+        self.canvas.set_draw_color(Color::BLACK);
+        self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, self.config.cell_width, self.config.cell_height)).expect("could not fill rect");
+    }
+
+    fn render_hover_cell(&mut self, i: u32) {
+        let x = i as u32 % self.config.grid_width * self.config.cell_width;
+        let y = i as u32 / self.config.grid_width * self.config.cell_height;
+        self.canvas.set_draw_color(Color::GRAY);
+        self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, self.config.cell_width, self.config.cell_height)).expect("could not fill rect");
     }
 }
 
 
 pub struct Cell {
-    live: Option<f32>,
-    hover: Option<f32>
+    live: Option<f32>
 }
 
 impl Cell {
     pub fn new(live: Option<f32>, hover: Option<f32>) -> Cell {
         Cell {
-            live: live,
-            hover: hover
+            live: live
         }
     }
 }
@@ -292,13 +300,6 @@ impl State {
         }
     }
 
-    pub fn is_hover(&self, i: i32) -> bool {
-        match &self.game_grid[i as usize] {
-            Some(Cell { hover: Some(_), .. } ) => { true },
-            _ => { false }
-        }
-    }
-
     pub fn should_live(&self, i: i32) -> bool {
         match self.neighbor_count(i) {
             2 => { self.is_live(i) },
@@ -307,22 +308,9 @@ impl State {
         }
     }
 
-    pub fn should_hover(&self, _i: i32, _t: f32) -> bool {
-        false
-    }
-
     pub fn get_live(&self, i: i32) -> Option<f32> {
         match &self.game_grid[i as usize] {
             Some(Cell { live: Some(t), .. } ) => {
-                return Some(*t);
-            },
-            _ => { None }
-        }
-    }
-
-    pub fn get_hover(&self, i: i32) -> Option<f32> {
-        match &self.game_grid[i as usize] {
-            Some(Cell { hover: Some(t), .. } ) => {
                 return Some(*t);
             },
             _ => { None }
@@ -335,13 +323,6 @@ impl State {
                 Cell::new(
                     self.get_live(i).or(Some(t)),
                     None
-                )
-            );
-        } else if self.should_hover(i, t) {
-            return Some(
-                Cell::new(
-                    None,
-                    self.get_hover(i).or(Some(t))
                 )
             );
         } else {
@@ -414,8 +395,6 @@ fn main() -> Result<(), String> {
     state.game_grid[1255] = Some(Cell::new(Some(t), None));
     state.game_grid[1256] = Some(Cell::new(Some(t), None));
     state.game_grid[1257] = Some(Cell::new(Some(t), None));
-
-    state.game_grid[2222] = Some(Cell::new(None, Some(t)));
 
     while game.running {
         let frame_time = timestep.delta();
