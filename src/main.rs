@@ -10,9 +10,9 @@ const WINDOW_HEIGHT: u32 = 600;
 const MS_PER_UPDATE: f32 = 250.0;
 const CELL_WIDTH: u32 = 10;
 const CELL_HEIGHT: u32 = 10;
-const GRID_WIDTH: u32 = 80;
-const GRID_HEIGHT: u32 = 60;
-const GRID_SIZE: u32 = GRID_WIDTH * GRID_HEIGHT;
+const GRID_WIDTH_IN_CELLS: u32 = 100; // 80
+const GRID_HEIGHT_IN_CELLS: u32 = 100; // 60
+const GRID_SIZE: u32 = GRID_WIDTH_IN_CELLS * GRID_HEIGHT_IN_CELLS;
 
 #[derive(Debug)]
 pub struct Config {
@@ -21,6 +21,8 @@ pub struct Config {
     dt: f32,
     cell_width: u32,
     cell_height: u32,
+    grid_width_in_cells: u32,
+    grid_height_in_cells: u32,
     grid_width: u32,
     grid_height: u32,
     grid_size: u32
@@ -34,9 +36,11 @@ impl Config {
             dt: MS_PER_UPDATE,
             cell_width: CELL_WIDTH,
             cell_height: CELL_HEIGHT,
-            grid_width: GRID_WIDTH,
-            grid_height: GRID_HEIGHT,
-            grid_size: GRID_SIZE
+            grid_width_in_cells: GRID_WIDTH_IN_CELLS,
+            grid_height_in_cells: GRID_HEIGHT_IN_CELLS,
+            grid_size: GRID_WIDTH_IN_CELLS * GRID_HEIGHT_IN_CELLS,
+            grid_width: GRID_WIDTH_IN_CELLS * CELL_WIDTH,
+            grid_height: GRID_HEIGHT_IN_CELLS * CELL_HEIGHT
         }
     }
 }
@@ -113,16 +117,16 @@ impl Game {
     }
 
     pub fn integrate(&mut self, mut state: State, t: f32) -> State {
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) && self.offset_y > -500 {
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) && self.offset_y > -1000 {
             self.offset_y -= 10;
         }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) && self.offset_y < 500 {
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) && self.offset_y < 1000 {
             self.offset_y += 10;
         }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) && self.offset_x > -500 {
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) && self.offset_x > -1000 {
             self.offset_x -= 10;
         }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) && self.offset_x < 500 {
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) && self.offset_x < 1000 {
             self.offset_x += 10;
         }
 
@@ -145,10 +149,10 @@ impl Game {
                     state.reset();
                 },
                 Event::MouseButtonDown { x, y, .. } => {
-                    let grid_i = Game::get_grid_i(x, y, self.offset_x, self.offset_y);
+                    let grid_i = Game::get_grid_i(x - self.offset_x, y - self.offset_y, &self.config);
                     match &grid_i {
                         Some(i) => {
-                            state.game_grid[*i] = Some(Cell::new(Some(t), None));
+                            state.game_grid[*i] = Some(Cell::new(Some(t)));
                         },
                         _ => {}
                     }
@@ -169,20 +173,18 @@ impl Game {
 
         let mut new_state = State::new();
 
-        for i in 0..self.config.grid_size {
+        for i in 0..GRID_SIZE {
             new_state.game_grid[i as usize] = state.next(i as i32, t);
         }
 
         new_state
     }
 
-    pub fn get_grid_i(x: i32, y: i32, offset_x: i32, offset_y: i32) -> Option<usize> {
-        let x_with_offset = x - offset_x;
-        let y_with_offset = y - offset_y;
-        if x_with_offset >= 0 && y_with_offset >= 0 && x_with_offset < WINDOW_WIDTH as i32 && y_with_offset < WINDOW_HEIGHT as i32 {
-            let grid_x = x_with_offset / CELL_WIDTH as i32;
-            let grid_y = y_with_offset / CELL_HEIGHT as i32;
-            let grid_i = grid_x + grid_y * GRID_WIDTH as i32;
+    pub fn get_grid_i(x: i32, y: i32, config: &Config) -> Option<usize> {
+        if x >= 0 && y >= 0 && x < config.grid_width as i32 && y < config.grid_height as i32 {
+            let grid_x = x / config.cell_width as i32;
+            let grid_y = y / config.cell_height as i32;
+            let grid_i = grid_x + grid_y * config.grid_width_in_cells as i32;
             return Some(grid_i as usize);
         } else {
             return None;
@@ -210,29 +212,44 @@ impl Game {
 
         self.canvas.draw_line(
             Point::new(self.offset_x, self.offset_y),
-            Point::new(self.config.window_width as i32 + self.offset_x, self.offset_y)
+            Point::new(self.offset_x + self.config.grid_width as i32, self.offset_y)
         ).expect("could not draw line");
         self.canvas.draw_line(
-            Point::new(self.config.window_width as i32 + self.offset_x, self.offset_y),
-            Point::new(self.config.window_width as i32 + self.offset_x, self.config.window_height as i32 + self.offset_y)
+            Point::new(self.offset_x + self.config.grid_width as i32, self.offset_y),
+            Point::new(
+                self.offset_x + self.config.grid_width as i32,
+                self.offset_y + self.config.grid_height as i32
+            )
         ).expect("could not draw line");
 
-        for i in 0..self.config.grid_height {
+        for i in 0..self.config.grid_height_in_cells {
             self.canvas.draw_line(
-                Point::new(self.offset_x, (i * self.config.cell_height + 10) as i32 + self.offset_y),
-                Point::new(self.config.window_width as i32 + self.offset_x, (i * self.config.cell_height + 10) as i32 + self.offset_y)
+                Point::new(
+                    self.offset_x,
+                    self.offset_y + ((i + 1) * self.config.cell_height) as i32
+                ),
+                Point::new(
+                    self.offset_x + self.config.grid_width as i32,
+                    self.offset_y + ((i + 1) * self.config.cell_height) as i32
+                )
             ).expect("could not draw line");
         }
-        for i in 0..self.config.grid_width {
+        for i in 0..self.config.grid_width_in_cells {
             self.canvas.draw_line(
-                Point::new((i * self.config.cell_width)  as i32 + self.offset_x, self.offset_y),
-                Point::new((i * self.config.cell_width) as i32 + self.offset_x, self.config.window_height as i32 + self.offset_y)
+                Point::new(
+                    self.offset_x + (i * self.config.cell_width)  as i32,
+                    self.offset_y
+                ),
+                Point::new(
+                    self.offset_x + (i * self.config.cell_width) as i32,
+                    self.offset_y + self.config.grid_height as i32
+                )
             ).expect("could not draw line");
         }
     }
 
     fn render_state(&mut self, state: &State) {
-        for i in 0..GRID_SIZE {
+        for i in 0..self.config.grid_size {
             if state.is_live(i as i32) {
                 let x = i % self.config.grid_width * self.config.cell_width;
                 let y = i / self.config.grid_width * self.config.cell_height;
@@ -242,7 +259,7 @@ impl Game {
     }
 
     fn render_hover(&mut self) {
-        match Game::get_grid_i(self.event_pump.mouse_state().x(), self.event_pump.mouse_state().y(), self.offset_x, self.offset_y) {
+        match Game::get_grid_i(self.event_pump.mouse_state().x() - self.offset_x, self.event_pump.mouse_state().y() - self.offset_y, &self.config) {
             Some(i) => {
                 self.render_hover_cell(i as u32);
             },
@@ -251,15 +268,15 @@ impl Game {
     }
 
     fn render_live_cell(&mut self, i: u32) {
-        let x = i % self.config.grid_width * self.config.cell_width;
-        let y = i / self.config.grid_width * self.config.cell_height;
+        let x = i % self.config.grid_width_in_cells * self.config.cell_width;
+        let y = i / self.config.grid_width_in_cells * self.config.cell_height;
         self.canvas.set_draw_color(Color::BLACK);
         self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, self.config.cell_width, self.config.cell_height)).expect("could not fill rect");
     }
 
     fn render_hover_cell(&mut self, i: u32) {
-        let x = i as u32 % self.config.grid_width * self.config.cell_width;
-        let y = i as u32 / self.config.grid_width * self.config.cell_height;
+        let x = i as u32 % self.config.grid_width_in_cells * self.config.cell_width;
+        let y = i as u32 / self.config.grid_width_in_cells * self.config.cell_height;
         self.canvas.set_draw_color(Color::GRAY);
         self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, self.config.cell_width, self.config.cell_height)).expect("could not fill rect");
     }
@@ -271,7 +288,7 @@ pub struct Cell {
 }
 
 impl Cell {
-    pub fn new(live: Option<f32>, hover: Option<f32>) -> Cell {
+    pub fn new(live: Option<f32>) -> Cell {
         Cell {
             live: live
         }
@@ -320,10 +337,7 @@ impl State {
     pub fn next(&self, i: i32, t: f32) -> Option<Cell> {
         if self.should_live(i) {
             return Some(
-                Cell::new(
-                    self.get_live(i).or(Some(t)),
-                    None
-                )
+                Cell::new(self.get_live(i).or(Some(t)))
             );
         } else {
             None
@@ -334,8 +348,8 @@ impl State {
         let mut count = 0;
 
         let _grid_size = GRID_SIZE as i32;
-        let grid_width = GRID_WIDTH as i32;
-        let grid_height = GRID_HEIGHT as i32;
+        let grid_width = GRID_WIDTH_IN_CELLS as i32;
+        let grid_height = GRID_HEIGHT_IN_CELLS as i32;
 
         let top = i / grid_width == 0;
         let bottom = i / grid_width >= grid_height - 1;
@@ -392,9 +406,9 @@ fn main() -> Result<(), String> {
     let mut timestep = TimeStep::new();
     let mut accumulator = 0.0;
     let mut state = State::new();
-    state.game_grid[1255] = Some(Cell::new(Some(t), None));
-    state.game_grid[1256] = Some(Cell::new(Some(t), None));
-    state.game_grid[1257] = Some(Cell::new(Some(t), None));
+    state.game_grid[1255] = Some(Cell::new(Some(t)));
+    state.game_grid[1256] = Some(Cell::new(Some(t)));
+    state.game_grid[1257] = Some(Cell::new(Some(t)));
 
     while game.running {
         let frame_time = timestep.delta();
