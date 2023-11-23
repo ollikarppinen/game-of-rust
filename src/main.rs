@@ -7,7 +7,7 @@ use std::time::Instant;
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
-const MS_PER_UPDATE: f32 = 4.0;
+const MS_PER_UPDATE: f32 = 250.0;
 const CELL_WIDTH: u32 = 10;
 const CELL_HEIGHT: u32 = 10;
 const GRID_WIDTH: u32 = 80;
@@ -136,10 +136,10 @@ impl Game {
                     self.paused = !self.paused;
                 },
                 Event::KeyDown { keycode: Some(Keycode::Plus), .. } => {
-                    // if self.ms_per_state_update > 0.0 { self.ms_per_state_update -= 100.0 }
+                    if self.config.dt > 50.0 { self.config.dt -= 200.0 }
                 },
                 Event::KeyDown { keycode: Some(Keycode::Minus), .. } => {
-                    // if self.ms_per_state_update < 1000.0 { self.ms_per_state_update += 100.0;}
+                    if self.config.dt < 500.0 { self.config.dt += 200.0 }
                 },
                 Event::KeyDown { keycode: Some(Keycode::R), .. } => {
                     state.reset();
