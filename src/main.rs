@@ -10,9 +10,11 @@ const WINDOW_HEIGHT: u32 = 600;
 const MS_PER_UPDATE: f32 = 250.0;
 const CELL_WIDTH: u32 = 10;
 const CELL_HEIGHT: u32 = 10;
-const GRID_WIDTH_IN_CELLS: u32 = 80; // 80
-const GRID_HEIGHT_IN_CELLS: u32 = 60; // 60
+const GRID_WIDTH_IN_CELLS: u32 = 50; // 80
+const GRID_HEIGHT_IN_CELLS: u32 = 50; // 60
 const GRID_SIZE: u32 = GRID_WIDTH_IN_CELLS * GRID_HEIGHT_IN_CELLS;
+const INITIAL_X_OFFSET: i32 = ((WINDOW_WIDTH - GRID_WIDTH_IN_CELLS * CELL_WIDTH) / 2) as i32;
+const INITIAL_Y_OFFSET: i32 = ((WINDOW_HEIGHT - GRID_HEIGHT_IN_CELLS * CELL_HEIGHT) / 2) as i32;
 
 #[derive(Debug)]
 pub struct Config {
@@ -111,8 +113,8 @@ impl Game {
             state_update: 0.0,
             running: true,
             paused: false,
-            offset_x: 0,
-            offset_y: 0
+            offset_x: INITIAL_X_OFFSET,
+            offset_y: INITIAL_Y_OFFSET
         }
     }
 
