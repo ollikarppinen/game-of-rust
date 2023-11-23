@@ -10,8 +10,8 @@ const WINDOW_HEIGHT: u32 = 600;
 const MS_PER_UPDATE: f32 = 250.0;
 const CELL_WIDTH: u32 = 10;
 const CELL_HEIGHT: u32 = 10;
-const GRID_WIDTH_IN_CELLS: u32 = 100; // 80
-const GRID_HEIGHT_IN_CELLS: u32 = 100; // 60
+const GRID_WIDTH_IN_CELLS: u32 = 80; // 80
+const GRID_HEIGHT_IN_CELLS: u32 = 60; // 60
 const GRID_SIZE: u32 = GRID_WIDTH_IN_CELLS * GRID_HEIGHT_IN_CELLS;
 
 #[derive(Debug)]
@@ -159,7 +159,9 @@ impl Game {
                                     state.game_grid[*i] = None;
                                 },
                                 None => {
-                            state.game_grid[*i] = Some(Cell::new(Some(t)));
+                                    state.game_grid[*i] = Some(Cell::new(Some(t)));
+                                }
+                            }
                         },
                         _ => {}
                     }
@@ -354,38 +356,50 @@ impl State {
     pub fn neighbor_count(&self, i: i32) -> u8 {
         let mut count = 0;
 
-        let _grid_size = GRID_SIZE as i32;
         let grid_width = GRID_WIDTH_IN_CELLS as i32;
         let grid_height = GRID_HEIGHT_IN_CELLS as i32;
+        let grid_size = grid_width * grid_height;
 
         let top = i / grid_width == 0;
         let bottom = i / grid_width >= grid_height - 1;
         let left = i % grid_width == 0;
-        let right = i % grid_width >= grid_width - 1;
+        let right = i % grid_width == grid_width - 1;
 
         let mut ii = i - 1;
-        if !left && self.is_live(ii){ count += 1 }
+        if left { ii += grid_width }
+        if self.is_live(ii){ count += 1 }
 
         ii = i + 1;
-        if !right && self.is_live(ii) { count += 1 }
+        if right { ii -= grid_width }
+        if self.is_live(ii) { count += 1 }
 
         ii = i - grid_width - 1;
-        if !top && !left && self.is_live(ii) { count += 1 }
+        if left { ii += grid_width }
+        if top { ii += grid_size }
+        if self.is_live(ii) { count += 1 }
 
         ii = i - grid_width;
-        if !top && self.is_live(ii) { count += 1 }
+        if top { ii += grid_size }
+        if self.is_live(ii) { count += 1 }
 
         ii = i - grid_width + 1;
-        if !top && !right && self.is_live(ii) { count += 1 }
+        if right { ii -= grid_width }
+        if top { ii += grid_size }
+        if self.is_live(ii) { count += 1 }
 
         ii = i + grid_width - 1;
-        if !bottom && !left && self.is_live(ii) { count += 1 }
+        if left { ii += grid_width }
+        if bottom { ii -= grid_size }
+        if self.is_live(ii) { count += 1 }
 
         ii = i + grid_width;
-        if !bottom && self.is_live(ii) { count += 1 }
+        if bottom { ii -= grid_size }
+        if self.is_live(ii) { count += 1 }
 
         ii = i + grid_width + 1;
-        if !bottom && !right && self.is_live(ii) { count += 1 }
+        if right { ii -= grid_width }
+        if bottom { ii -= grid_size }
+        if self.is_live(ii) { count += 1 }
 
         count
     }
@@ -413,9 +427,14 @@ fn main() -> Result<(), String> {
     let mut timestep = TimeStep::new();
     let mut accumulator = 0.0;
     let mut state = State::new();
-    state.game_grid[1255] = Some(Cell::new(Some(t)));
-    state.game_grid[1256] = Some(Cell::new(Some(t)));
-    state.game_grid[1257] = Some(Cell::new(Some(t)));
+
+
+    state.game_grid[2279] = Some(Cell::new(Some(t)));
+    state.game_grid[2278] = Some(Cell::new(Some(t)));
+    state.game_grid[2277] = Some(Cell::new(Some(t)));
+    state.game_grid[2197] = Some(Cell::new(Some(t)));
+    state.game_grid[2358] = Some(Cell::new(Some(t)));
+
 
     while game.running {
         let frame_time = timestep.delta();
