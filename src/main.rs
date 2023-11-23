@@ -12,6 +12,8 @@ const CELL_WIDTH: u32 = 10;
 const CELL_HEIGHT: u32 = 10;
 const GRID_WIDTH_IN_CELLS: u32 = 50; // 80
 const GRID_HEIGHT_IN_CELLS: u32 = 50; // 60
+const GRID_WIDTH: u32 = GRID_WIDTH_IN_CELLS * CELL_WIDTH;
+const GRID_HEIGHT: u32 = GRID_HEIGHT_IN_CELLS * CELL_HEIGHT;
 const GRID_SIZE: u32 = GRID_WIDTH_IN_CELLS * GRID_HEIGHT_IN_CELLS;
 const INITIAL_X_OFFSET: i32 = ((WINDOW_WIDTH - GRID_WIDTH_IN_CELLS * CELL_WIDTH) / 2) as i32;
 const INITIAL_Y_OFFSET: i32 = ((WINDOW_HEIGHT - GRID_HEIGHT_IN_CELLS * CELL_HEIGHT) / 2) as i32;
@@ -119,16 +121,16 @@ impl Game {
     }
 
     pub fn integrate(&mut self, mut state: State, t: f32) -> State {
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) && self.offset_y > -1000 {
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) && self.offset_y > -(GRID_HEIGHT as i32) / 2 {
             self.offset_y -= 1;
         }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) && self.offset_y < 1000 {
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) && self.offset_y < (GRID_HEIGHT as i32) {
             self.offset_y += 1;
         }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) && self.offset_x > -1000 {
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) && self.offset_x > -(GRID_WIDTH as i32) / 2 {
             self.offset_x -= 1;
         }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) && self.offset_x < 1000 {
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) && self.offset_x < (GRID_WIDTH as i32) {
             self.offset_x += 1;
         }
 
