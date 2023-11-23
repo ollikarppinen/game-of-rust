@@ -150,6 +150,16 @@ impl Game {
                 Event::KeyDown { keycode: Some(Keycode::R), .. } => {
                     state.reset();
                 },
+                Event::KeyDown { keycode: Some(Keycode::P), .. } => {
+                    for i in 0..GRID_SIZE {
+                        match &state.game_grid[i as usize] {
+                            Some(_) => {
+                                println!("i: {}", i);
+                            },
+                            _ => {}
+                        }
+                    }
+                },
                 Event::MouseButtonDown { x, y, .. } => {
                     let grid_i = Game::get_grid_i(x - self.offset_x, y - self.offset_y, &self.config);
                     match &grid_i {
@@ -427,15 +437,107 @@ fn main() -> Result<(), String> {
     let mut t: f32 = 0.0;
 
     let mut timestep = TimeStep::new();
-    let mut accumulator = 0.0;
+    let mut accumulator = -1000.0;
     let mut state = State::new();
 
-
-    state.game_grid[2279] = Some(Cell::new(Some(t)));
-    state.game_grid[2278] = Some(Cell::new(Some(t)));
-    state.game_grid[2277] = Some(Cell::new(Some(t)));
-    state.game_grid[2197] = Some(Cell::new(Some(t)));
-    state.game_grid[2358] = Some(Cell::new(Some(t)));
+    if GRID_WIDTH_IN_CELLS == 50 && GRID_HEIGHT_IN_CELLS == 50 {
+        state.game_grid[763] = Some(Cell::new(Some(t)));
+        state.game_grid[764] = Some(Cell::new(Some(t)));
+        state.game_grid[765] = Some(Cell::new(Some(t)));
+        state.game_grid[766] = Some(Cell::new(Some(t)));
+        state.game_grid[778] = Some(Cell::new(Some(t)));
+        state.game_grid[779] = Some(Cell::new(Some(t)));
+        state.game_grid[780] = Some(Cell::new(Some(t)));
+        state.game_grid[813] = Some(Cell::new(Some(t)));
+        state.game_grid[818] = Some(Cell::new(Some(t)));
+        state.game_grid[819] = Some(Cell::new(Some(t)));
+        state.game_grid[820] = Some(Cell::new(Some(t)));
+        state.game_grid[822] = Some(Cell::new(Some(t)));
+        state.game_grid[823] = Some(Cell::new(Some(t)));
+        state.game_grid[824] = Some(Cell::new(Some(t)));
+        state.game_grid[825] = Some(Cell::new(Some(t)));
+        state.game_grid[826] = Some(Cell::new(Some(t)));
+        state.game_grid[828] = Some(Cell::new(Some(t)));
+        state.game_grid[863] = Some(Cell::new(Some(t)));
+        state.game_grid[865] = Some(Cell::new(Some(t)));
+        state.game_grid[866] = Some(Cell::new(Some(t)));
+        state.game_grid[868] = Some(Cell::new(Some(t)));
+        state.game_grid[870] = Some(Cell::new(Some(t)));
+        state.game_grid[872] = Some(Cell::new(Some(t)));
+        state.game_grid[874] = Some(Cell::new(Some(t)));
+        state.game_grid[876] = Some(Cell::new(Some(t)));
+        state.game_grid[878] = Some(Cell::new(Some(t)));
+        state.game_grid[879] = Some(Cell::new(Some(t)));
+        state.game_grid[913] = Some(Cell::new(Some(t)));
+        state.game_grid[916] = Some(Cell::new(Some(t)));
+        state.game_grid[918] = Some(Cell::new(Some(t)));
+        state.game_grid[919] = Some(Cell::new(Some(t)));
+        state.game_grid[920] = Some(Cell::new(Some(t)));
+        state.game_grid[922] = Some(Cell::new(Some(t)));
+        state.game_grid[924] = Some(Cell::new(Some(t)));
+        state.game_grid[926] = Some(Cell::new(Some(t)));
+        state.game_grid[928] = Some(Cell::new(Some(t)));
+        state.game_grid[963] = Some(Cell::new(Some(t)));
+        state.game_grid[964] = Some(Cell::new(Some(t)));
+        state.game_grid[965] = Some(Cell::new(Some(t)));
+        state.game_grid[966] = Some(Cell::new(Some(t)));
+        state.game_grid[968] = Some(Cell::new(Some(t)));
+        state.game_grid[970] = Some(Cell::new(Some(t)));
+        state.game_grid[972] = Some(Cell::new(Some(t)));
+        state.game_grid[976] = Some(Cell::new(Some(t)));
+        state.game_grid[978] = Some(Cell::new(Some(t)));
+        state.game_grid[979] = Some(Cell::new(Some(t)));
+        state.game_grid[980] = Some(Cell::new(Some(t)));
+        state.game_grid[1123] = Some(Cell::new(Some(t)));
+        state.game_grid[1124] = Some(Cell::new(Some(t)));
+        state.game_grid[1169] = Some(Cell::new(Some(t)));
+        state.game_grid[1170] = Some(Cell::new(Some(t)));
+        state.game_grid[1171] = Some(Cell::new(Some(t)));
+        state.game_grid[1173] = Some(Cell::new(Some(t)));
+        state.game_grid[1219] = Some(Cell::new(Some(t)));
+        state.game_grid[1221] = Some(Cell::new(Some(t)));
+        state.game_grid[1223] = Some(Cell::new(Some(t)));
+        state.game_grid[1224] = Some(Cell::new(Some(t)));
+        state.game_grid[1269] = Some(Cell::new(Some(t)));
+        state.game_grid[1270] = Some(Cell::new(Some(t)));
+        state.game_grid[1271] = Some(Cell::new(Some(t)));
+        state.game_grid[1273] = Some(Cell::new(Some(t)));
+        state.game_grid[1413] = Some(Cell::new(Some(t)));
+        state.game_grid[1414] = Some(Cell::new(Some(t)));
+        state.game_grid[1415] = Some(Cell::new(Some(t)));
+        state.game_grid[1422] = Some(Cell::new(Some(t)));
+        state.game_grid[1423] = Some(Cell::new(Some(t)));
+        state.game_grid[1425] = Some(Cell::new(Some(t)));
+        state.game_grid[1426] = Some(Cell::new(Some(t)));
+        state.game_grid[1427] = Some(Cell::new(Some(t)));
+        state.game_grid[1463] = Some(Cell::new(Some(t)));
+        state.game_grid[1465] = Some(Cell::new(Some(t)));
+        state.game_grid[1472] = Some(Cell::new(Some(t)));
+        state.game_grid[1476] = Some(Cell::new(Some(t)));
+        state.game_grid[1513] = Some(Cell::new(Some(t)));
+        state.game_grid[1514] = Some(Cell::new(Some(t)));
+        state.game_grid[1515] = Some(Cell::new(Some(t)));
+        state.game_grid[1516] = Some(Cell::new(Some(t)));
+        state.game_grid[1518] = Some(Cell::new(Some(t)));
+        state.game_grid[1520] = Some(Cell::new(Some(t)));
+        state.game_grid[1522] = Some(Cell::new(Some(t)));
+        state.game_grid[1523] = Some(Cell::new(Some(t)));
+        state.game_grid[1526] = Some(Cell::new(Some(t)));
+        state.game_grid[1563] = Some(Cell::new(Some(t)));
+        state.game_grid[1566] = Some(Cell::new(Some(t)));
+        state.game_grid[1568] = Some(Cell::new(Some(t)));
+        state.game_grid[1570] = Some(Cell::new(Some(t)));
+        state.game_grid[1573] = Some(Cell::new(Some(t)));
+        state.game_grid[1576] = Some(Cell::new(Some(t)));
+        state.game_grid[1613] = Some(Cell::new(Some(t)));
+        state.game_grid[1616] = Some(Cell::new(Some(t)));
+        state.game_grid[1618] = Some(Cell::new(Some(t)));
+        state.game_grid[1619] = Some(Cell::new(Some(t)));
+        state.game_grid[1620] = Some(Cell::new(Some(t)));
+        state.game_grid[1622] = Some(Cell::new(Some(t)));
+        state.game_grid[1623] = Some(Cell::new(Some(t)));
+        state.game_grid[1626] = Some(Cell::new(Some(t)));
+    }
 
 
     while game.running {
