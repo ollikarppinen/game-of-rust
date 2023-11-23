@@ -5,15 +5,42 @@ use sdl2::rect::{Rect, Point};
 use sdl2::video::Window;
 use std::time::Instant;
 
-const MS_PER_UPDATE: f32 = 4.0;
-const DEFAULT_MS_PER_STATE_UPDATE: f32 = 200.0;
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
+const MS_PER_UPDATE: f32 = 4.0;
 const CELL_WIDTH: u32 = 10;
 const CELL_HEIGHT: u32 = 10;
-const GRID_WIDTH: u32 = WINDOW_WIDTH / CELL_WIDTH; // 80
-const GRID_HEIGHT: u32 = WINDOW_HEIGHT / CELL_HEIGHT; // 60
+const GRID_WIDTH: u32 = 80;
+const GRID_HEIGHT: u32 = 60;
 const GRID_SIZE: u32 = GRID_WIDTH * GRID_HEIGHT;
+
+#[derive(Debug)]
+pub struct Config {
+    window_width: u32,
+    window_height: u32,
+    dt: f32,
+    cell_width: u32,
+    cell_height: u32,
+    grid_width: u32,
+    grid_height: u32,
+    grid_size: u32
+}
+
+impl Config {
+    pub fn new() -> Config {
+        Config {
+            window_width: WINDOW_WIDTH,
+            window_height: WINDOW_HEIGHT,
+            dt: MS_PER_UPDATE,
+            cell_width: CELL_WIDTH,
+            cell_height: CELL_HEIGHT,
+            grid_width: GRID_WIDTH,
+            grid_height: GRID_HEIGHT,
+            grid_size: GRID_SIZE
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct TimeStep {
     last_time:   Instant,
@@ -59,33 +86,33 @@ impl TimeStep {
 }
 
 pub struct Game {
+    config: Config,
     canvas: Canvas<Window>,
     event_pump: sdl2::EventPump,
     frame_count: u8,
     state_update: f32,
     running: bool,
     paused: bool,
-    ms_per_state_update: f32,
     offset_x: i32,
     offset_y: i32
 }
 
 impl Game {
-    pub fn new(canvas: Canvas<Window>, event_pump: sdl2::EventPump) -> Game {
+    pub fn new(canvas: Canvas<Window>, event_pump: sdl2::EventPump, config: Config) -> Game {
         Game {
+            config: config,
             canvas: canvas,
             event_pump: event_pump,
             frame_count: 0,
             state_update: 0.0,
             running: true,
             paused: false,
-            ms_per_state_update: DEFAULT_MS_PER_STATE_UPDATE,
             offset_x: 0,
             offset_y: 0
         }
     }
 
-    pub fn update(&mut self, mut state: State, t: f32, _dt: f32) -> State {
+    pub fn integrate(&mut self, mut state: State, t: f32) -> State {
         if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) && self.offset_y > -500 {
             self.offset_y -= 10;
         }
@@ -99,6 +126,13 @@ impl Game {
             self.offset_x += 10;
         }
 
+        match Game::get_grid_i(self.event_pump.mouse_state().x(), self.event_pump.mouse_state().y(), self.offset_x, self.offset_y) {
+            Some(i) => {
+                if !state.is_live(i as i32) { state.game_grid[i] = Some(Cell::new(None, Some(t))) }
+            },
+            None => {}
+        };
+
         for event in self.event_pump.poll_iter() {
             match event {
                 Event::Quit { ..  } |
@@ -109,10 +143,10 @@ impl Game {
                     self.paused = !self.paused;
                 },
                 Event::KeyDown { keycode: Some(Keycode::Plus), .. } => {
-                    if self.ms_per_state_update > 0.0 { self.ms_per_state_update -= 100.0 }
+                    // if self.ms_per_state_update > 0.0 { self.ms_per_state_update -= 100.0 }
                 },
                 Event::KeyDown { keycode: Some(Keycode::Minus), .. } => {
-                    if self.ms_per_state_update < 1000.0 { self.ms_per_state_update += 100.0;}
+                    // if self.ms_per_state_update < 1000.0 { self.ms_per_state_update += 100.0;}
                 },
                 Event::KeyDown { keycode: Some(Keycode::R), .. } => {
                     state.reset();
@@ -121,34 +155,29 @@ impl Game {
                     let grid_i = Game::get_grid_i(x, y, self.offset_x, self.offset_y);
                     match &grid_i {
                         Some(i) => {
-                            state.grid[*i] = Some(Cell::new(Some(t), None));
+                            state.game_grid[*i] = Some(Cell::new(Some(t), None));
                         },
                         _ => {}
                     }
                 },
-                Event::MouseMotion { x, y, .. } => {
-                    let grid_i = Game::get_grid_i(x, y, self.offset_x, self.offset_y);
-                    match &grid_i {
-                        Some(i) => {
-                            if !state.is_live(*i as i32) { state.grid[*i] = Some(Cell::new(None, Some(t))) }
-                        },
-                        _ => {}
-                    }
-                }
                 _ => {}
             }
         }
 
+        state
+    }
+
+    pub fn update(&mut self, state: State, t: f32) -> State {
         self.frame_count = (self.frame_count + 1) % 255;
 
-        if self.paused || t - self.state_update < self.ms_per_state_update { return state }
+        if self.paused { return state }
 
         self.state_update = t;
 
         let mut new_state = State::new();
 
-        for i in 0..GRID_SIZE {
-            new_state.grid[i as usize] = state.next(i as i32, t);
+        for i in 0..self.config.grid_size {
+            new_state.game_grid[i as usize] = state.next(i as i32, t);
         }
 
         new_state
@@ -167,6 +196,10 @@ impl Game {
         }
     }
 
+    pub fn dt(&self) -> f32 {
+        self.config.dt
+    }
+
     pub fn render(&mut self, state: &State) {
         let color = Color::WHITE;
         self.canvas.set_draw_color(color);
@@ -183,23 +216,23 @@ impl Game {
 
         self.canvas.draw_line(
             Point::new(self.offset_x, self.offset_y),
-            Point::new(WINDOW_WIDTH as i32 + self.offset_x, self.offset_y)
+            Point::new(self.config.window_width as i32 + self.offset_x, self.offset_y)
         ).expect("could not draw line");
         self.canvas.draw_line(
-            Point::new(WINDOW_WIDTH as i32 + self.offset_x, self.offset_y),
-            Point::new(WINDOW_WIDTH as i32 + self.offset_x, WINDOW_HEIGHT as i32 + self.offset_y)
+            Point::new(self.config.window_width as i32 + self.offset_x, self.offset_y),
+            Point::new(self.config.window_width as i32 + self.offset_x, self.config.window_height as i32 + self.offset_y)
         ).expect("could not draw line");
 
-        for i in 0..GRID_HEIGHT {
+        for i in 0..self.config.grid_height {
             self.canvas.draw_line(
-                Point::new(self.offset_x, (i * CELL_HEIGHT + 10) as i32 + self.offset_y),
-                Point::new(WINDOW_WIDTH as i32 + self.offset_x, (i * CELL_HEIGHT + 10) as i32 + self.offset_y)
+                Point::new(self.offset_x, (i * self.config.cell_height + 10) as i32 + self.offset_y),
+                Point::new(self.config.window_width as i32 + self.offset_x, (i * self.config.cell_height + 10) as i32 + self.offset_y)
             ).expect("could not draw line");
         }
-        for i in 0..GRID_WIDTH {
+        for i in 0..self.config.grid_width {
             self.canvas.draw_line(
-                Point::new((i * CELL_WIDTH)  as i32 + self.offset_x, self.offset_y),
-                Point::new((i * CELL_WIDTH) as i32 + self.offset_x, WINDOW_HEIGHT as i32 + self.offset_y)
+                Point::new((i * self.config.cell_width)  as i32 + self.offset_x, self.offset_y),
+                Point::new((i * self.config.cell_width) as i32 + self.offset_x, self.config.window_height as i32 + self.offset_y)
             ).expect("could not draw line");
         }
     }
@@ -207,16 +240,16 @@ impl Game {
     fn render_state(&mut self, state: &State) {
         for i in 0..GRID_SIZE {
             if state.is_hover(i as i32) {
-                let x = i % GRID_WIDTH * CELL_WIDTH;
-                let y = i / GRID_WIDTH * CELL_HEIGHT;
+                let x = i % self.config.grid_width * self.config.cell_width;
+                let y = i / self.config.grid_width * self.config.cell_height;
                 self.canvas.set_draw_color(Color::GRAY);
-                self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, CELL_WIDTH, CELL_HEIGHT)).expect("could not fill rect");
+                self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, self.config.cell_width, self.config.cell_height)).expect("could not fill rect");
             }
             if state.is_live(i as i32) {
-                let x = i % GRID_WIDTH * CELL_WIDTH;
-                let y = i / GRID_WIDTH * CELL_HEIGHT;
+                let x = i % self.config.grid_width * self.config.cell_width;
+                let y = i / self.config.grid_width * self.config.cell_height;
                 self.canvas.set_draw_color(Color::BLACK);
-                self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, CELL_WIDTH, CELL_HEIGHT)).expect("could not fill rect");
+                self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, self.config.cell_width, self.config.cell_height)).expect("could not fill rect");
             }
         }
     }
@@ -238,29 +271,29 @@ impl Cell {
 }
 
 pub struct State {
-    grid: [Option<Cell>; GRID_SIZE as usize]
+    game_grid: [Option<Cell>; GRID_SIZE as usize]
 }
 
 impl State {
     pub fn new() -> State {
         State {
-            grid: std::array::from_fn(|_| None)
+            game_grid: std::array::from_fn(|_| None)
         }
     }
 
     pub fn reset(&mut self) {
-        self.grid = std::array::from_fn(|_| None);
+        self.game_grid = std::array::from_fn(|_| None);
     }
 
     pub fn is_live(&self, i: i32) -> bool {
-        match &self.grid[i as usize] {
+        match &self.game_grid[i as usize] {
             Some(Cell { live: Some(_), .. } ) => { true },
             _ => { false }
         }
     }
 
     pub fn is_hover(&self, i: i32) -> bool {
-        match &self.grid[i as usize] {
+        match &self.game_grid[i as usize] {
             Some(Cell { hover: Some(_), .. } ) => { true },
             _ => { false }
         }
@@ -274,18 +307,12 @@ impl State {
         }
     }
 
-    pub fn should_hover(&self, i: i32, t: f32) -> bool {
-        match &self.grid[i as usize] {
-            Some(Cell { hover: Some(hover_t), .. } ) => {
-                println!("t: {}, hover_t: {}", t, hover_t);
-                t - hover_t < 10.0
-            },
-            _ => { false }
-        }
+    pub fn should_hover(&self, _i: i32, _t: f32) -> bool {
+        false
     }
 
     pub fn get_live(&self, i: i32) -> Option<f32> {
-        match &self.grid[i as usize] {
+        match &self.game_grid[i as usize] {
             Some(Cell { live: Some(t), .. } ) => {
                 return Some(*t);
             },
@@ -294,7 +321,7 @@ impl State {
     }
 
     pub fn get_hover(&self, i: i32) -> Option<f32> {
-        match &self.grid[i as usize] {
+        match &self.game_grid[i as usize] {
             Some(Cell { hover: Some(t), .. } ) => {
                 return Some(*t);
             },
@@ -366,7 +393,8 @@ fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
 
-    let window = video_subsystem.window("game-of-rust", WINDOW_WIDTH, WINDOW_HEIGHT)
+    let config = Config::new();
+    let window = video_subsystem.window("game-of-rust", config.window_width, config.window_height)
         .position_centered()
         .build()
         .expect("could not initialize video subsystem");
@@ -375,7 +403,7 @@ fn main() -> Result<(), String> {
 
     let event_pump: sdl2::EventPump = sdl_context.event_pump()?;
 
-    let mut game = Game::new(canvas, event_pump);
+    let mut game = Game::new(canvas, event_pump, config);
 
     // https://gafferongames.com/post/fix_your_timestep/
     let mut t: f32 = 0.0;
@@ -383,20 +411,22 @@ fn main() -> Result<(), String> {
     let mut timestep = TimeStep::new();
     let mut accumulator = 0.0;
     let mut state = State::new();
-    state.grid[1255] = Some(Cell::new(Some(t), None));
-    state.grid[1256] = Some(Cell::new(Some(t), None));
-    state.grid[1257] = Some(Cell::new(Some(t), None));
+    state.game_grid[1255] = Some(Cell::new(Some(t), None));
+    state.game_grid[1256] = Some(Cell::new(Some(t), None));
+    state.game_grid[1257] = Some(Cell::new(Some(t), None));
 
-    state.grid[2222] = Some(Cell::new(None, Some(t)));
+    state.game_grid[2222] = Some(Cell::new(None, Some(t)));
 
     while game.running {
         let frame_time = timestep.delta();
         accumulator += frame_time;
 
-        while accumulator >= MS_PER_UPDATE {
-            state = game.update(state, t, MS_PER_UPDATE);
-            t += MS_PER_UPDATE;
-            accumulator -= MS_PER_UPDATE;
+        state = game.integrate(state, t);
+
+        while accumulator >= game.dt() {
+            state = game.update(state, t);
+            t += game.dt();
+            accumulator -= game.dt();
         }
 
         // const double alpha = accumulator / dt;
