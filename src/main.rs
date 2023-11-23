@@ -118,16 +118,16 @@ impl Game {
 
     pub fn integrate(&mut self, mut state: State, t: f32) -> State {
         if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) && self.offset_y > -1000 {
-            self.offset_y -= 10;
+            self.offset_y -= 1;
         }
         if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) && self.offset_y < 1000 {
-            self.offset_y += 10;
+            self.offset_y += 1;
         }
         if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) && self.offset_x > -1000 {
-            self.offset_x -= 10;
+            self.offset_x -= 1;
         }
         if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) && self.offset_x < 1000 {
-            self.offset_x += 10;
+            self.offset_x += 1;
         }
 
         for event in self.event_pump.poll_iter() {
