@@ -1,3 +1,4 @@
+use rand::Rng;
 use sdl2::{pixels::Color, render::Canvas};
 use sdl2::event::Event;
 use sdl2::keyboard::{Keycode, self};
@@ -135,8 +136,13 @@ impl Game {
                 .map(|line| line.unwrap().parse::<usize>().unwrap())
                 .collect();
 
-            for number in numbers {
-                state.game_grid[number] = Some(Cell::new(Some(0.0)));
+            for i in numbers {
+                state.game_grid[i] = Some(Cell::new(Some(0.0)));
+            }
+        } else {
+            for _i in 0..(self.config.grid_size as f32 / 2.0).round() as i32 {
+                let i = rand::thread_rng().gen_range(0..self.config.grid_size);
+                state.game_grid[i as usize] = Some(Cell::new(Some(0.0)));
             }
         }
         state
