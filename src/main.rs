@@ -7,11 +7,11 @@ use std::time::Instant;
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
-const MS_PER_UPDATE: f32 = 250.0;
+const MS_PER_UPDATE: f32 = 100.0;
 const CELL_WIDTH: u32 = 10;
 const CELL_HEIGHT: u32 = 10;
-const GRID_WIDTH_IN_CELLS: u32 = 50; // 80
-const GRID_HEIGHT_IN_CELLS: u32 = 50; // 60
+const GRID_WIDTH_IN_CELLS: u32 = 50;
+const GRID_HEIGHT_IN_CELLS: u32 = 50;
 const GRID_WIDTH: u32 = GRID_WIDTH_IN_CELLS * CELL_WIDTH;
 const GRID_HEIGHT: u32 = GRID_HEIGHT_IN_CELLS * CELL_HEIGHT;
 const GRID_SIZE: u32 = GRID_WIDTH_IN_CELLS * GRID_HEIGHT_IN_CELLS;
@@ -144,10 +144,12 @@ impl Game {
                     self.paused = !self.paused;
                 },
                 Event::KeyDown { keycode: Some(Keycode::Plus), .. } => {
-                    if self.config.dt > 50.0 { self.config.dt -= 200.0 }
+                    if self.config.dt > 1.0 { self.config.dt /= 2.0 }
+                    println!("dt: {}", self.config.dt);
                 },
                 Event::KeyDown { keycode: Some(Keycode::Minus), .. } => {
-                    if self.config.dt < 500.0 { self.config.dt += 200.0 }
+                    if self.config.dt < 1000.0 { self.config.dt *= 2.0 }
+                    println!("dt: {}", self.config.dt);
                 },
                 Event::KeyDown { keycode: Some(Keycode::R), .. } => {
                     state.reset();
