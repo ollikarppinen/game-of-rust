@@ -15,8 +15,6 @@ const CELL_WIDTH: u32 = 10;
 const CELL_HEIGHT: u32 = 10;
 const GRID_WIDTH_IN_CELLS: u32 = 50;
 const GRID_HEIGHT_IN_CELLS: u32 = 50;
-const GRID_WIDTH: u32 = GRID_WIDTH_IN_CELLS * CELL_WIDTH;
-const GRID_HEIGHT: u32 = GRID_HEIGHT_IN_CELLS * CELL_HEIGHT;
 const GRID_SIZE: u32 = GRID_WIDTH_IN_CELLS * GRID_HEIGHT_IN_CELLS;
 const INITIAL_X_OFFSET: i32 = ((WINDOW_WIDTH - GRID_WIDTH_IN_CELLS * CELL_WIDTH) / 2) as i32;
 const INITIAL_Y_OFFSET: i32 = ((WINDOW_HEIGHT - GRID_HEIGHT_IN_CELLS * CELL_HEIGHT) / 2) as i32;
@@ -121,6 +119,27 @@ impl Game {
             offset_x: INITIAL_X_OFFSET,
             offset_y: INITIAL_Y_OFFSET
         }
+    }
+    
+    pub fn initial_state(&mut self) -> State {
+        let mut state = State::new();
+        let grid_width_in_cells = self.config.grid_width_in_cells;
+        let grid_height_in_cells = self.config.grid_height_in_cells;
+        let file_path = format!("./initial_cells/{grid_width_in_cells}_{grid_height_in_cells}.txt");
+        if Path::new(&file_path).exists() {
+            let file = File::open(file_path).expect("file wasn't found.");
+            let reader = BufReader::new(file);
+
+            let numbers: Vec<usize> = reader
+                .lines()
+                .map(|line| line.unwrap().parse::<usize>().unwrap())
+                .collect();
+
+            for number in numbers {
+                state.game_grid[number] = Some(Cell::new(Some(0.0)));
+            }
+        }
+        state
     }
 
     pub fn integrate(&mut self, mut state: State, t: f32) -> State {
@@ -439,31 +458,13 @@ fn main() -> Result<(), String> {
     let event_pump: sdl2::EventPump = sdl_context.event_pump()?;
 
     let mut game = Game::new(canvas, event_pump, config);
+    let mut state = game.initial_state();
 
     // https://gafferongames.com/post/fix_your_timestep/
     let mut t: f32 = 0.0;
 
     let mut timestep = TimeStep::new();
     let mut accumulator = -1000.0;
-    let mut state = State::new();
-
-
-    let grid_width_in_cells = game.config.grid_width_in_cells;
-    let grid_height_in_cells = game.config.grid_height_in_cells;
-    let file_path = format!("./initial_cells/{grid_width_in_cells}_{grid_height_in_cells}.txt");
-    if Path::new(&file_path).exists() {
-        let file = File::open(file_path).expect("file wasn't found.");
-        let reader = BufReader::new(file);
-
-        let numbers: Vec<usize> = reader
-            .lines()
-            .map(|line| line.unwrap().parse::<usize>().unwrap())
-            .collect();
-
-        for number in numbers {
-            state.game_grid[number] = Some(Cell::new(Some(t)));
-        }
-    }
 
 
     while game.running {
