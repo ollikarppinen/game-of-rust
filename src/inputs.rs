@@ -23,6 +23,9 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
         state.camera_x_velocity = 0.0;
     }
 
+    state.cursor_x = event_pump.mouse_state().x();
+    state.cursor_y = event_pump.mouse_state().y();
+
     for event in event_pump.poll_iter() {
         match event {
             Event::Quit { ..  } |
