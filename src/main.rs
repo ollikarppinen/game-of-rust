@@ -175,11 +175,13 @@ impl Game {
                 Event::KeyDown { keycode: Some(Keycode::P), .. } => {
                 },
                 Event::MouseButtonDown { x, y, .. } => {
-                    let game_x = ((x + self.offset_x - if x + self.offset_x < 0 { self.config.cell_width as i32 } else { 0 }) as f32 / self.config.cell_width as f32) as i32;
-                    let game_y = ((y + self.offset_y - if y + self.offset_y < 0 { self.config.cell_height as i32 } else { 0 }) as f32 / self.config.cell_height as f32) as i32;
-                    let coord = Coord::new(game_x, game_y);
+                    let coord = Game::screen_coord_to_game_coord(x, y, self.offset_x, self.offset_y, &self.config);
                     println!("x: {}, y: {}, offset x: {}, offset y: {}, coord: {}", x, y, self.offset_x, self.offset_y, coord);
-                    state.cell_coords.insert(coord);
+                    if state.cell_coords.contains(&coord) {
+                        state.cell_coords.remove(&coord);
+                    } else {
+                        state.cell_coords.insert(coord);
+                    }
                 },
                 _ => {}
             }
