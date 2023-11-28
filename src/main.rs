@@ -1,5 +1,3 @@
-use sdl2::render::Canvas;
-use sdl2::video::Window;
 use std::collections::HashSet;
 use std::fmt;
 use std::time::Instant;
@@ -7,6 +5,7 @@ use std::time::Instant;
 mod rendering;
 mod inputs;
 mod state_mgmt;
+mod utils;
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
@@ -78,40 +77,6 @@ impl TimeStep {
             return Some(tmp);
         }
         None
-    }
-}
-
-pub struct Game {
-    config: Config,
-    canvas: Canvas<Window>,
-    event_pump: sdl2::EventPump,
-    frame_count: u8,
-    state_update: f32,
-    running: bool,
-    paused: bool
-}
-
-impl Game {
-    pub fn new(canvas: Canvas<Window>, event_pump: sdl2::EventPump, config: Config) -> Game {
-        Game {
-            config: config,
-            canvas: canvas,
-            event_pump: event_pump,
-            frame_count: 0,
-            state_update: 0.0,
-            running: true,
-            paused: false
-        }
-    }
-
-    fn screen_coord_to_game_coord(x: i32, y: i32, offset_x: i32, offset_y: i32, config: &Config) -> Coord {
-        let mut x = x + offset_x;
-        let mut y = y + offset_y;
-        if x < 0 { x = x - config.cell_width as i32 + 1 }
-        if y < 0 { y = y - config.cell_height as i32 + 1 }
-        x = (x as f32 / config.cell_width as f32) as i32;
-        y = (y as f32 / config.cell_height as f32) as i32;
-        Coord::new(x, y)
     }
 }
 

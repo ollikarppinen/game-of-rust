@@ -1,6 +1,8 @@
 use sdl2::{keyboard::{self, Keycode}, event::Event};
 
-use crate::{State, Config, Game};
+use crate::{State, Config, utils};
+
+// pub mod utils;
 
 pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config: &Config) -> () {
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) {
@@ -49,7 +51,7 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                 }
             },
             Event::MouseButtonDown { x, y, .. } => {
-                let coord = Game::screen_coord_to_game_coord(x, y, state.camera_x_offset, state.camera_y_offset, config);
+                let coord = utils::screen_coord_to_game_coord(x, y, state.camera_x_offset, state.camera_y_offset, config);
                 println!("x: {}, y: {}, offset x: {}, offset y: {}, coord: {}", x, y, state.camera_x_offset, state.camera_y_offset, coord);
                 if state.cell_coords.contains(&coord) {
                     state.cell_coords.remove(&coord);
