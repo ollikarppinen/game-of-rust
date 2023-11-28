@@ -173,6 +173,10 @@ impl Game {
                     self.offset_y = 0;
                 },
                 Event::KeyDown { keycode: Some(Keycode::P), .. } => {
+                    for coord in &state.cell_coords {
+                        println!("{}", coord.x);
+                        println!("{}", coord.y);
+                    }
                 },
                 Event::MouseButtonDown { x, y, .. } => {
                     let coord = Game::screen_coord_to_game_coord(x, y, self.offset_x, self.offset_y, &self.config);
