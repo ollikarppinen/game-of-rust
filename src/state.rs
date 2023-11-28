@@ -5,6 +5,8 @@ use crate::Coord;
 const INITIAL_X_OFFSET: i32 = 0;
 const INITIAL_Y_OFFSET: i32 = 0;
 const INITIAL_CELL_UPDATE_INTERVAL: f32 = 100.0;
+const INITIAL_CELL_WIDTH: u32 = 10;
+const INITIAL_CELL_HEIGHT: u32 = 10;
 
 pub struct State {
     pub cell_coords: HashSet<Coord>,
@@ -19,7 +21,9 @@ pub struct State {
     pub camera_x_velocity: f32,
     pub camera_y_velocity: f32,
     pub camera_x_acceleration: f32,
-    pub camera_y_acceleration: f32
+    pub camera_y_acceleration: f32,
+    pub cell_width: u32,
+    pub cell_height: u32
 }
 
 impl State {
@@ -37,7 +41,10 @@ impl State {
             camera_x_velocity: 0.0,
             camera_y_velocity: 0.0,
             camera_x_acceleration: 0.0,
-            camera_y_acceleration: 0.0
+            camera_y_acceleration: 0.0,
+            cell_width: INITIAL_CELL_WIDTH,
+            cell_height: INITIAL_CELL_HEIGHT
+
         }
     }
 
