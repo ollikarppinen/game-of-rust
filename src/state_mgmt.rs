@@ -28,6 +28,11 @@ pub fn initial_state() -> State {
 }
 
 pub fn update(state: &mut State, t: f32, dt: f32) -> () {
+    update_camera(state, t, dt);
+    update_cells(state, t, dt);
+}
+
+fn update_cells(state: &mut State, t: f32, dt: f32) -> () {
     if state.paused { return }
     if state.t_since_last_cell_update < state.cell_update_interval {
         state.t_since_last_cell_update += dt;
@@ -45,4 +50,11 @@ pub fn update(state: &mut State, t: f32, dt: f32) -> () {
 
     state.t_since_last_cell_update -= state.cell_update_interval;
     state.cell_coords = new_cell_coords;
+}
+
+fn update_camera(state: &mut State, t: f32, dt: f32) -> () {
+    state.camera_x_velocity += state.camera_x_acceleration;
+    state.camera_y_velocity += state.camera_y_acceleration;
+    state.camera_x_offset += state.camera_x_velocity as i32;
+    state.camera_y_offset += state.camera_y_velocity as i32;
 }

@@ -15,7 +15,11 @@ pub struct State {
     pub cursor_x: i32,
     pub cursor_y: i32,
     pub running: bool,
-    pub paused: bool
+    pub paused: bool,
+    pub camera_x_velocity: f32,
+    pub camera_y_velocity: f32,
+    pub camera_x_acceleration: f32,
+    pub camera_y_acceleration: f32
 }
 
 impl State {
@@ -29,7 +33,11 @@ impl State {
             cursor_x: 0,
             cursor_y: 0,
             running: true,
-            paused: false
+            paused: false,
+            camera_x_velocity: 0.0,
+            camera_y_velocity: 0.0,
+            camera_x_acceleration: 0.0,
+            camera_y_acceleration: 0.0
         }
     }
 

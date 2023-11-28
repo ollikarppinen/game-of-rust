@@ -6,20 +6,21 @@ use crate::{Config, utils, state::State};
 
 pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config: &Config) -> () {
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) {
-        state.camera_y_offset += 1;
-        println!("offset_y: {}", state.camera_y_offset);
+        if state.camera_y_acceleration < 5.0 { state.camera_y_acceleration += 0.02 }
+    } else if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) {
+        if state.camera_y_acceleration > -5.0 { state.camera_y_acceleration -= 0.02 }
+    } else {
+        state.camera_y_acceleration = 0.0;
+        state.camera_y_velocity = 0.0;
     }
-    if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) {
-        state.camera_y_offset -= 1;
-        println!("offset_y: {}", state.camera_y_offset);
-    }
+
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) {
-        state.camera_x_offset += 1;
-        println!("offset_x: {}", state.camera_x_offset);
-    }
-    if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) {
-        state.camera_x_offset -= 1;
-        println!("offset_x: {}", state.camera_x_offset);
+        if state.camera_y_acceleration < 5.0 { state.camera_x_acceleration += 0.02 }
+    } else if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) {
+        if state.camera_y_acceleration > -5.0 { state.camera_x_acceleration -= 0.02 }
+    } else {
+        state.camera_x_acceleration = 0.0;
+        state.camera_x_velocity = 0.0;
     }
 
     for event in event_pump.poll_iter() {
@@ -32,11 +33,11 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                 state.paused = !state.paused;
             },
             Event::KeyDown { keycode: Some(Keycode::Plus), .. } => {
-                // if config.dt > 1.0 { config.dt /= 2.0 }
+                if state.cell_update_interval > config.dt { state.cell_update_interval /= 2.0 }
                 println!("dt: {}", config.dt);
             },
             Event::KeyDown { keycode: Some(Keycode::Minus), .. } => {
-                // if config.dt < 1000.0 { config.dt *= 2.0 }
+                if state.cell_update_interval < 5000.0 { state.cell_update_interval *= 2.0 }
                 println!("dt: {}", config.dt);
             },
             Event::KeyDown { keycode: Some(Keycode::R), .. } => {
