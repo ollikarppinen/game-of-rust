@@ -1,13 +1,12 @@
-use sdl2::{pixels::Color, render::Canvas};
-use sdl2::event::Event;
-use sdl2::keyboard::{Keycode, self};
-use sdl2::rect::{Rect, Point};
+use sdl2::render::Canvas;
 use sdl2::video::Window;
 use std::collections::HashSet;
 use std::fmt;
-use std::fs::File;
-use std::io::{BufReader, BufRead};
 use std::time::Instant;
+
+mod rendering;
+mod inputs;
+mod state_mgmt;
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
@@ -89,9 +88,7 @@ pub struct Game {
     frame_count: u8,
     state_update: f32,
     running: bool,
-    paused: bool,
-    offset_x: i32,
-    offset_y: i32
+    paused: bool
 }
 
 impl Game {
@@ -103,165 +100,7 @@ impl Game {
             frame_count: 0,
             state_update: 0.0,
             running: true,
-            paused: false,
-            offset_x: INITIAL_X_OFFSET,
-            offset_y: INITIAL_Y_OFFSET
-        }
-    }
-    
-    pub fn initial_state(&mut self) -> State {
-        let mut state = State::new();
-        // return state;
-
-        let file = File::open("./initial_cells.txt").expect("file wasn't found.");
-        let reader = BufReader::new(file);
-        let mut coords: Vec<i32> = reader
-            .lines()
-            .map(|line| line.unwrap().parse::<i32>().unwrap())
-            .collect();
-
-        while !coords.is_empty() {
-            match (coords.pop(), coords.pop()) {
-                (Some(x), Some(y)) => {
-                    state.cell_coords.insert(Coord::new(x, y));
-                },
-                _ => {}
-            }
-        }
-
-        state
-    }
-
-    pub fn integrate(&mut self, mut state: State, t: f32) -> State {
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) {
-            self.offset_y += 1;
-            println!("offset_y: {}", self.offset_y);
-        }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) {
-            self.offset_y -= 1;
-            println!("offset_y: {}", self.offset_y);
-        }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) {
-            self.offset_x += 1;
-            println!("offset_x: {}", self.offset_x);
-        }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) {
-            self.offset_x -= 1;
-            println!("offset_x: {}", self.offset_x);
-        }
-
-        for event in self.event_pump.poll_iter() {
-            match event {
-                Event::Quit { ..  } |
-                Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                    self.running = false;
-                },
-                Event::KeyDown { keycode: Some(Keycode::Space), .. } => {
-                    self.paused = !self.paused;
-                },
-                Event::KeyDown { keycode: Some(Keycode::Plus), .. } => {
-                    if self.config.dt > 1.0 { self.config.dt /= 2.0 }
-                    println!("dt: {}", self.config.dt);
-                },
-                Event::KeyDown { keycode: Some(Keycode::Minus), .. } => {
-                    if self.config.dt < 1000.0 { self.config.dt *= 2.0 }
-                    println!("dt: {}", self.config.dt);
-                },
-                Event::KeyDown { keycode: Some(Keycode::R), .. } => {
-                    // state.reset();
-                    self.offset_x = 0;
-                    self.offset_y = 0;
-                },
-                Event::KeyDown { keycode: Some(Keycode::P), .. } => {
-                    for coord in &state.cell_coords {
-                        println!("{}", coord.x);
-                        println!("{}", coord.y);
-                    }
-                },
-                Event::MouseButtonDown { x, y, .. } => {
-                    let coord = Game::screen_coord_to_game_coord(x, y, self.offset_x, self.offset_y, &self.config);
-                    println!("x: {}, y: {}, offset x: {}, offset y: {}, coord: {}", x, y, self.offset_x, self.offset_y, coord);
-                    if state.cell_coords.contains(&coord) {
-                        state.cell_coords.remove(&coord);
-                    } else {
-                        state.cell_coords.insert(coord);
-                    }
-                },
-                _ => {}
-            }
-        }
-
-        state
-    }
-
-    pub fn update(&mut self, state: State, t: f32) -> State {
-        self.frame_count = (self.frame_count + 1) % 255;
-
-        if self.paused { return state }
-
-        self.state_update = t;
-
-        let mut new_state = State::new();
-
-        for cell_coord in &state.cell_coords {
-            if state.should_live(&cell_coord) { new_state.cell_coords.insert(cell_coord.clone()); }
-            // update_coords.push(cell_coord.clone());
-            for neighbor_coord in cell_coord.neighbors() {
-                // update_coords.push(neighbor_coord);
-                if state.should_live(&neighbor_coord) { new_state.cell_coords.insert(neighbor_coord.clone()); }
-            }
-        }
-
-        new_state
-    }
-
-    pub fn dt(&self) -> f32 {
-        self.config.dt
-    }
-
-    pub fn render(&mut self, state: &State) {
-        let color = Color::WHITE;
-        self.canvas.set_draw_color(color);
-        self.canvas.clear();
-
-        self.render_hover();
-        self.render_state(state);
-        self.render_grid();
-
-        self.canvas.present();
-    }
-
-    fn render_grid(&mut self) {
-        self.canvas.set_draw_color(Color::BLACK);
-
-        let mut i: i32 = 0;
-        let max_i: i32 = if self.config.window_height > self.config.window_width { self.config.window_height as i32 } else { self.config.window_width as i32 };
-        let di: i32 = if self.config.window_height > self.config.window_width { self.config.cell_width as i32 } else { self.config.cell_height as i32 };
-        while i < max_i {
-            let coord = Game::screen_coord_to_game_coord(i, i, self.offset_x, self.offset_y, &self.config);
-            let x = coord.x * self.config.cell_width as i32 - self.offset_x;
-            let y = coord.y * self.config.cell_height as i32 - self.offset_y;
-            self.canvas.draw_line(
-                Point::new(
-                    x,
-                    0
-                ),
-                Point::new(
-                    x,
-                    self.config.window_height as i32
-                )
-            ).expect("could not draw line");
-            self.canvas.draw_line(
-                Point::new(
-                    0,
-                    y
-                ),
-                Point::new(
-                    self.config.window_width as i32,
-                    y
-                )
-            ).expect("could not draw line");
-            i += di;
+            paused: false
         }
     }
 
@@ -273,39 +112,6 @@ impl Game {
         x = (x as f32 / config.cell_width as f32) as i32;
         y = (y as f32 / config.cell_height as f32) as i32;
         Coord::new(x, y)
-    }
-
-    fn render_state(&mut self, state: &State) {
-        let mut y: i32 = 0;  
-        while y < self.config.window_height as i32 {
-            let mut x: i32 = 0;
-            while x < self.config.window_width as i32 {
-                let coord = Game::screen_coord_to_game_coord(x, y, self.offset_x, self.offset_y, &self.config);
-                if state.cell_coords.contains(&coord) {
-                    self.render_cell(&coord, Color::BLACK);
-                }
-                x += self.config.cell_width as i32;
-            }
-            y += self.config.cell_height as i32;
-        }
-    }
-
-    fn render_hover(&mut self) {
-        let coord = Game::screen_coord_to_game_coord(
-            self.event_pump.mouse_state().x(),
-            self.event_pump.mouse_state().y(),
-            self.offset_x,
-            self.offset_y,
-            &self.config
-        );
-        self.render_cell(&coord, Color::GRAY);
-    }
-
-    fn render_cell(&mut self, coord: &Coord, color: Color) {
-        let x = coord.x * self.config.cell_width as i32 - self.offset_x;
-        let y = coord.y * self.config.cell_height as i32 - self.offset_y;
-        self.canvas.set_draw_color(color);
-        self.canvas.fill_rect(Rect::new(x, y, self.config.cell_width, self.config.cell_height)).expect("could not fill rect");
     }
 }
 
@@ -360,13 +166,25 @@ impl Clone for Coord {
 }
 
 pub struct State {
-    cell_coords: HashSet<Coord>
+    cell_coords: HashSet<Coord>,
+    camera_x_offset: i32,
+    camera_y_offset: i32,
+    cursor_x: i32,
+    cursor_y: i32,
+    running: bool,
+    paused: bool
 }
 
 impl State {
     pub fn new() -> State {
         State {
-            cell_coords: HashSet::new()
+            cell_coords: HashSet::new(),
+            camera_x_offset: INITIAL_X_OFFSET,
+            camera_y_offset: INITIAL_Y_OFFSET,
+            cursor_x: 0,
+            cursor_y: 0,
+            running: true,
+            paused: false
         }
     }
 
@@ -406,29 +224,28 @@ fn main() -> Result<(), String> {
         .position_centered()
         .build()
         .expect("could not initialize video subsystem");
-    let canvas = window.into_canvas().build()
+    let mut canvas = window.into_canvas().build()
         .expect("could not make a canvas");
 
-    let event_pump: sdl2::EventPump = sdl_context.event_pump()?;
+    let mut event_pump: sdl2::EventPump = sdl_context.event_pump()?;
 
-    let mut game = Game::new(canvas, event_pump, config);
-    let mut state = game.initial_state();
+    let mut state = state_mgmt::initial_state();
 
     // https://gafferongames.com/post/fix_your_timestep/
     let mut t: f32 = 0.0;
     let mut timestep = TimeStep::new();
     let mut accumulator = -1000.0;
 
-    while game.running {
+    while state.running {
         let frame_time = timestep.delta();
         accumulator += frame_time;
 
-        state = game.integrate(state, t);
+        inputs::handle_inputs(&mut state, &mut event_pump, &config);
 
-        while accumulator >= game.dt() {
-            state = game.update(state, t);
-            t += game.dt();
-            accumulator -= game.dt();
+        while accumulator >= config.dt {
+            state_mgmt::update(&mut state, t);
+            t += config.dt;
+            accumulator -= config.dt;
         }
 
         // const double alpha = accumulator / dt;
@@ -438,7 +255,7 @@ fn main() -> Result<(), String> {
 
         // render( state );
 
-        game.render(&state);
+        rendering::render(&mut canvas, &state, &config);
     }
 
     Ok(())
