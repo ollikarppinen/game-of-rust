@@ -1,6 +1,6 @@
 use sdl2::{keyboard::{self, Keycode}, event::Event};
 
-use crate::{State, Config, utils};
+use crate::{Config, utils, state::State};
 
 // pub mod utils;
 

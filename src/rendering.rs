@@ -1,7 +1,8 @@
 use sdl2::rect::{Rect, Point};
 use sdl2::{render::Canvas, pixels::Color};
 use sdl2::video::Window;
-use crate::{State, Coord, utils};
+use crate::state::State;
+use crate::{Coord, utils};
 use crate::Config;
 
 pub fn render(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> () {

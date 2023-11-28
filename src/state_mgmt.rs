@@ -2,7 +2,8 @@ use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-use crate::{State, Coord};
+use crate::Coord;
+use crate::state::State;
 
 pub fn initial_state() -> State {
     let mut state = State::new();
