@@ -27,8 +27,12 @@ pub fn initial_state() -> State {
     state
 }
 
-pub fn update(state: &mut State, t: f32) -> () {
+pub fn update(state: &mut State, t: f32, dt: f32) -> () {
     if state.paused { return }
+    if state.t_since_last_cell_update < state.cell_update_interval {
+        state.t_since_last_cell_update += dt;
+        return
+    }
 
     let mut new_cell_coords = HashSet::new();
 
@@ -39,5 +43,6 @@ pub fn update(state: &mut State, t: f32) -> () {
         }
     }
 
+    state.t_since_last_cell_update -= state.cell_update_interval;
     state.cell_coords = new_cell_coords;
 }

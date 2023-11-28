@@ -36,10 +36,9 @@ fn main() -> Result<(), String> {
         let frame_time = timestep.delta();
         accumulator += frame_time;
 
-        inputs::handle_inputs(&mut state, &mut event_pump, &config);
-
         while accumulator >= config.dt {
-            state_mgmt::update(&mut state, t);
+            inputs::handle_inputs(&mut state, &mut event_pump, &config);
+            state_mgmt::update(&mut state, t, config.dt);
             t += config.dt;
             accumulator -= config.dt;
         }

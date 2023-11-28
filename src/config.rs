@@ -1,6 +1,6 @@
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
-const MS_PER_UPDATE: f32 = 100.0;
+const MS_PER_UPDATE: f32 = 16.0;
 const CELL_WIDTH: u32 = 10;
 const CELL_HEIGHT: u32 = 10;
 

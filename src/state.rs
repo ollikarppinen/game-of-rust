@@ -4,9 +4,12 @@ use crate::Coord;
 
 const INITIAL_X_OFFSET: i32 = 0;
 const INITIAL_Y_OFFSET: i32 = 0;
+const INITIAL_CELL_UPDATE_INTERVAL: f32 = 100.0;
 
 pub struct State {
     pub cell_coords: HashSet<Coord>,
+    pub cell_update_interval: f32,
+    pub t_since_last_cell_update: f32,
     pub camera_x_offset: i32,
     pub camera_y_offset: i32,
     pub cursor_x: i32,
@@ -19,6 +22,8 @@ impl State {
     pub fn new() -> State {
         State {
             cell_coords: HashSet::new(),
+            cell_update_interval: INITIAL_CELL_UPDATE_INTERVAL,
+            t_since_last_cell_update: 0.0,
             camera_x_offset: INITIAL_X_OFFSET,
             camera_y_offset: INITIAL_Y_OFFSET,
             cursor_x: 0,
