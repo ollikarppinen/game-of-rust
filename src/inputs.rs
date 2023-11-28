@@ -43,6 +43,14 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                 if state.cell_update_interval < 5000.0 { state.cell_update_interval *= 2.0 }
                 println!("dt: {}", config.dt);
             },
+            Event::KeyDown { keycode: Some(Keycode::Z), .. } => {
+                if state.cell_width > 3 { state.cell_width -= 1 }
+                if state.cell_height > 3 { state.cell_height -= 1 }
+            },
+            Event::KeyDown { keycode: Some(Keycode::X), .. } => {
+                if state.cell_width < 20 { state.cell_width += 1 }
+                if state.cell_height < 20 { state.cell_height += 1 }
+            },
             Event::KeyDown { keycode: Some(Keycode::R), .. } => {
                 state.reset();
                 state.camera_x_offset = 0;
