@@ -134,19 +134,19 @@ impl Game {
 
     pub fn integrate(&mut self, mut state: State, t: f32) -> State {
         if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) {
-            self.offset_y -= 1;
-            println!("offset_y: {}", self.offset_y);
-        }
-        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) {
             self.offset_y += 1;
             println!("offset_y: {}", self.offset_y);
         }
+        if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) {
+            self.offset_y -= 1;
+            println!("offset_y: {}", self.offset_y);
+        }
         if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) {
-            self.offset_x -= 1;
+            self.offset_x += 1;
             println!("offset_x: {}", self.offset_x);
         }
         if self.event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) {
-            self.offset_x += 1;
+            self.offset_x -= 1;
             println!("offset_x: {}", self.offset_x);
         }
 
@@ -175,11 +175,10 @@ impl Game {
                 Event::KeyDown { keycode: Some(Keycode::P), .. } => {
                 },
                 Event::MouseButtonDown { x, y, .. } => {
-                    let coord = Coord::new(
-                        ((x + self.offset_x) as f32 / self.config.cell_width as f32) as i32,
-                        ((y + self.offset_y) as f32 / self.config.cell_height as f32) as i32
-                    );
-                    println!("click coord: {}", coord);
+                    let game_x = ((x + self.offset_x - if x + self.offset_x < 0 { self.config.cell_width as i32 } else { 0 }) as f32 / self.config.cell_width as f32) as i32;
+                    let game_y = ((y + self.offset_y - if y + self.offset_y < 0 { self.config.cell_height as i32 } else { 0 }) as f32 / self.config.cell_height as f32) as i32;
+                    let coord = Coord::new(game_x, game_y);
+                    println!("x: {}, y: {}, offset x: {}, offset y: {}, coord: {}", x, y, self.offset_x, self.offset_y, coord);
                     state.cell_coords.insert(coord);
                 },
                 _ => {}
@@ -229,8 +228,13 @@ impl Game {
     fn render_grid(&mut self) {
         self.canvas.set_draw_color(Color::BLACK);
 
-        let mut x = self.offset_x % self.config.cell_width as i32;
-        while x < self.config.window_width as i32 {
+        let mut i: i32 = 0;
+        let max_i: i32 = if self.config.window_height > self.config.window_width { self.config.window_height as i32 } else { self.config.window_width as i32 };
+        let di: i32 = if self.config.window_height > self.config.window_width { self.config.cell_width as i32 } else { self.config.cell_height as i32 };
+        while i < max_i {
+            let coord = Game::screen_coord_to_game_coord(i, i, self.offset_x, self.offset_y, &self.config);
+            let x = coord.x * self.config.cell_width as i32 - self.offset_x;
+            let y = coord.y * self.config.cell_height as i32 - self.offset_y;
             self.canvas.draw_line(
                 Point::new(
                     x,
@@ -241,10 +245,6 @@ impl Game {
                     self.config.window_height as i32
                 )
             ).expect("could not draw line");
-            x += self.config.cell_width as i32;
-        }
-        let mut y = self.offset_y % self.config.cell_height as i32;
-        while y < self.config.window_height as i32 {
             self.canvas.draw_line(
                 Point::new(
                     0,
@@ -255,36 +255,51 @@ impl Game {
                     y
                 )
             ).expect("could not draw line");
+            i += di;
+        }
+    }
+
+    fn screen_coord_to_game_coord(x: i32, y: i32, offset_x: i32, offset_y: i32, config: &Config) -> Coord {
+        let mut x = x + offset_x;
+        let mut y = y + offset_y;
+        if x < 0 { x = x - config.cell_width as i32 + 1 }
+        if y < 0 { y = y - config.cell_height as i32 + 1 }
+        x = (x as f32 / config.cell_width as f32) as i32;
+        y = (y as f32 / config.cell_height as f32) as i32;
+        Coord::new(x, y)
+    }
+
+    fn render_state(&mut self, state: &State) {
+        let mut y: i32 = 0;  
+        while y < self.config.window_height as i32 {
+            let mut x: i32 = 0;
+            while x < self.config.window_width as i32 {
+                let coord = Game::screen_coord_to_game_coord(x, y, self.offset_x, self.offset_y, &self.config);
+                if state.cell_coords.contains(&coord) {
+                    self.render_cell(&coord, Color::BLACK);
+                }
+                x += self.config.cell_width as i32;
+            }
             y += self.config.cell_height as i32;
         }
     }
 
-    fn render_state(&mut self, state: &State) {
-        for coord in &state.cell_coords {
-            self.render_live_cell(&coord);
-        }
-    }
-
     fn render_hover(&mut self) {
-        let coord = Coord::new(
-            ((self.event_pump.mouse_state().x() + self.offset_x) as f32 / self.config.cell_width as f32) as i32,
-            ((self.event_pump.mouse_state().y() + self.offset_y) as f32 / self.config.cell_height as f32) as i32
+        let coord = Game::screen_coord_to_game_coord(
+            self.event_pump.mouse_state().x(),
+            self.event_pump.mouse_state().y(),
+            self.offset_x,
+            self.offset_y,
+            &self.config
         );
-        self.render_hover_cell(coord);
+        self.render_cell(&coord, Color::GRAY);
     }
 
-    fn render_live_cell(&mut self, coord: &Coord) {
-        let x = coord.x * self.config.cell_width as i32;
-        let y = coord.y * self.config.cell_height as i32;
-        self.canvas.set_draw_color(Color::BLACK);
-        self.canvas.fill_rect(Rect::new(x + self.offset_x, y + self.offset_y, self.config.cell_width, self.config.cell_height)).expect("could not fill rect");
-    }
-
-    fn render_hover_cell(&mut self, coord: Coord) {
-        let x = coord.x * self.config.cell_width as i32;
-        let y = coord.y * self.config.cell_height as i32;
-        self.canvas.set_draw_color(Color::GRAY);
-        self.canvas.fill_rect(Rect::new(x as i32 + self.offset_x, y as i32 + self.offset_y, self.config.cell_width, self.config.cell_height)).expect("could not fill rect");
+    fn render_cell(&mut self, coord: &Coord, color: Color) {
+        let x = coord.x * self.config.cell_width as i32 - self.offset_x;
+        let y = coord.y * self.config.cell_height as i32 - self.offset_y;
+        self.canvas.set_draw_color(color);
+        self.canvas.fill_rect(Rect::new(x, y, self.config.cell_width, self.config.cell_height)).expect("could not fill rect");
     }
 }
 
