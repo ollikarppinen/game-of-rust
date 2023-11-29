@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::Coord;
+use crate::{Coord, timestep::TimeStep};
 
 const INITIAL_X_OFFSET: i32 = 0;
 const INITIAL_Y_OFFSET: i32 = 0;
@@ -23,7 +23,9 @@ pub struct State {
     pub camera_x_acceleration: f32,
     pub camera_y_acceleration: f32,
     pub cell_width: u32,
-    pub cell_height: u32
+    pub cell_height: u32,
+    pub t: f32,
+    pub timestep: TimeStep
 }
 
 impl State {
@@ -43,8 +45,9 @@ impl State {
             camera_x_acceleration: 0.0,
             camera_y_acceleration: 0.0,
             cell_width: INITIAL_CELL_WIDTH,
-            cell_height: INITIAL_CELL_HEIGHT
-
+            cell_height: INITIAL_CELL_HEIGHT,
+            t: 0.0,
+            timestep: TimeStep::new()
         }
     }
 

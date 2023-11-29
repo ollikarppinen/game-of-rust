@@ -27,9 +27,9 @@ pub fn initial_state() -> State {
     state
 }
 
-pub fn update(state: &mut State, t: f32, dt: f32) -> () {
-    update_camera(state, t, dt);
-    update_cells(state, t, dt);
+pub fn update(state: &mut State, dt: f32) -> () {
+    update_camera(state, state.t, dt);
+    update_cells(state, state.t, dt);
 }
 
 fn update_cells(state: &mut State, t: f32, dt: f32) -> () {

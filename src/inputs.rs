@@ -89,6 +89,9 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                     println!("{}", coord.y);
                 }
             },
+            Event::KeyDown { keycode: Some(Keycode::F), .. } => {
+                println!("FPS: {}", state.timestep.frame_rate().unwrap_or(0));
+            },
             Event::MouseButtonDown { x, y, .. } => {
                 let coord = utils::screen_coord_to_game_coord(x, y, state);
                 println!("x: {}, y: {}, offset x: {}, offset y: {}, coord: {}", x, y, state.camera_x_offset, state.camera_y_offset, coord);

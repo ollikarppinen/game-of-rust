@@ -1,5 +1,4 @@
 use config::Config;
-use timestep::TimeStep;
 use coord::Coord;
 
 mod rendering;
@@ -28,18 +27,16 @@ fn main() -> Result<(), String> {
     let mut state = state_mgmt::initial_state();
 
     // https://gafferongames.com/post/fix_your_timestep/
-    let mut t: f32 = 0.0;
-    let mut timestep = TimeStep::new();
     let mut accumulator = -1000.0;
 
     while state.running {
-        let frame_time = timestep.delta();
+        let frame_time = state.timestep.delta();
         accumulator += frame_time;
 
         while accumulator >= config.dt {
             inputs::handle_inputs(&mut state, &mut event_pump, &config);
-            state_mgmt::update(&mut state, t, config.dt);
-            t += config.dt;
+            state_mgmt::update(&mut state, config.dt);
+            state.t += config.dt;
             accumulator -= config.dt;
         }
 
