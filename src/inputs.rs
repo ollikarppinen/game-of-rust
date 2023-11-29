@@ -44,26 +44,39 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                 println!("dt: {}", config.dt);
             },
             Event::KeyDown { keycode: Some(Keycode::Z), .. } => {
-                let old_width = config.window_width as f32 / state.cell_width as f32;
-                let old_height = config.window_height as f32 / state.cell_height as f32;
-                if state.cell_width > 3 { state.cell_width -= 1 }
-                if state.cell_height > 3 { state.cell_height -= 1 }
-                let new_width = config.window_width as f32 / state.cell_width as f32;
-                let new_height = config.window_height as f32 / state.cell_height as f32;
-                // TODO: Fix me :(
-                state.camera_x_offset += ((old_width - new_width) * state.cell_width as f32 / 2.0) as i32;
-                state.camera_y_offset += ((old_height - new_height) * state.cell_height as f32 / 2.0) as i32;
+                // ZOOM OUT
+                let old_center_coord = utils::screen_coord_to_game_coord(
+                    (config.window_width as f32 / 2.0).round() as i32,
+                    (config.window_height as f32 / 2.0).round() as i32,
+                    state
+                );
+                if state.cell_width > 1 { state.cell_width -= 1 }
+                if state.cell_height > 1 { state.cell_height -= 1 }
+                let new_center_coord = utils::screen_coord_to_game_coord(
+                    (config.window_width as f32 / 2.0).round() as i32,
+                    (config.window_height as f32 / 2.0).round() as i32,
+                    state
+                );
+
+                state.camera_x_offset += (old_center_coord.x - new_center_coord.x) * state.cell_width as i32;
+                state.camera_y_offset += (old_center_coord.y - new_center_coord.y) * state.cell_height as i32;
             },
             Event::KeyDown { keycode: Some(Keycode::X), .. } => {
-                let old_width = config.window_width as f32 / state.cell_width as f32;
-                let old_height = config.window_height as f32 / state.cell_height as f32;
+                // ZOOM IN
+                let old_center_coord = utils::screen_coord_to_game_coord(
+                    (config.window_width as f32 / 2.0).round() as i32,
+                    (config.window_height as f32 / 2.0).round() as i32,
+                    state
+                );
                 if state.cell_width < 20 { state.cell_width += 1 }
                 if state.cell_height < 20 { state.cell_height += 1 }
-                let new_width = config.window_width as f32 / state.cell_width as f32;
-                let new_height = config.window_height as f32 / state.cell_height as f32;
-                // TODO: Fix me :(
-                state.camera_x_offset += ((old_width - new_width) * state.cell_width as f32 / 2.0) as i32;
-                state.camera_y_offset += ((old_height - new_height) * state.cell_height as f32 / 2.0) as i32;
+                let new_center_coord = utils::screen_coord_to_game_coord(
+                    (config.window_width as f32 / 2.0).round() as i32,
+                    (config.window_height as f32 / 2.0).round() as i32,
+                    state
+                );
+                state.camera_x_offset += (old_center_coord.x - new_center_coord.x) * state.cell_width as i32;
+                state.camera_y_offset += (old_center_coord.y - new_center_coord.y) * state.cell_height as i32;
             },
             Event::KeyDown { keycode: Some(Keycode::R), .. } => {
                 state.reset();
