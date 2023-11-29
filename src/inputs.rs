@@ -50,8 +50,8 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                     (config.window_height as f32 / 2.0).round() as i32,
                     state
                 );
-                if state.cell_width > 1 { state.cell_width -= 1 }
-                if state.cell_height > 1 { state.cell_height -= 1 }
+                if state.cell_width > config.min_cell_width { state.cell_width -= 1 }
+                if state.cell_height > config.min_cell_height { state.cell_height -= 1 }
                 let new_center_coord = utils::screen_coord_to_game_coord(
                     (config.window_width as f32 / 2.0).round() as i32,
                     (config.window_height as f32 / 2.0).round() as i32,
@@ -68,8 +68,8 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                     (config.window_height as f32 / 2.0).round() as i32,
                     state
                 );
-                if state.cell_width < 20 { state.cell_width += 1 }
-                if state.cell_height < 20 { state.cell_height += 1 }
+                if state.cell_width < config.max_cell_width { state.cell_width += 1 }
+                if state.cell_height < config.max_cell_height { state.cell_height += 1 }
                 let new_center_coord = utils::screen_coord_to_game_coord(
                     (config.window_width as f32 / 2.0).round() as i32,
                     (config.window_height as f32 / 2.0).round() as i32,
