@@ -18,7 +18,13 @@ pub fn render(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> ()
 }
 
 fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
-    canvas.set_draw_color(Color::BLACK);
+    if state.cell_height < 5 {
+        return
+    } else if state.cell_height < 10 {
+        canvas.set_draw_color(Color::GRAY);
+    } else {
+        canvas.set_draw_color(Color::BLACK);
+    }
 
     let mut i: i32 = 0;
     let max_i: i32 = if config.window_height > config.window_width { config.window_height as i32 } else { config.window_width as i32 };
