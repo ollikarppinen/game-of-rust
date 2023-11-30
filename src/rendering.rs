@@ -15,6 +15,7 @@ pub fn render(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> ()
     render_grid(canvas, &state, &config);
 
     if state.paused {
+        render_blur(canvas, &state, &config);
         let message: String = "Paused".to_string();
         let _ = render_message(&message, canvas, &state, &config);
     }
@@ -44,6 +45,15 @@ fn render_message(message: &String, canvas: &mut Canvas<Window>, _state: &State,
     canvas.copy(&texture, None, Some(target))?;
 
     Ok(())
+}
+
+fn render_blur(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
+    let mut color = config.background_color.clone();
+    color.a = 50;
+
+    canvas.set_draw_color(color);
+    canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
+    canvas.fill_rect(Rect::new(0, 0, config.window_width, config.window_height)).expect("could not fill rect");
 }
 
 fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
