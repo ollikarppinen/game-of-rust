@@ -6,11 +6,11 @@ use crate::{Coord, utils};
 use crate::Config;
 
 pub fn render(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> () {
-    let color = Color::WHITE;
+    let color = config.background_color;
     canvas.set_draw_color(color);
     canvas.clear();
 
-    render_hover(canvas, &state);
+    render_hover(canvas, &state, &config);
     render_state(canvas, &state, &config);
     render_grid(canvas, &state, &config);
 
@@ -28,7 +28,7 @@ fn render_message(message: &String, canvas: &mut Canvas<Window>, _state: &State,
     let texture_creator = canvas.texture_creator();
     let surface = font
         .render(message)
-        .blended(Color::RGBA(255, 0, 0, 100))
+        .blended(config.font_color)
         .map_err(|e| e.to_string())?;
     let texture = texture_creator
         .create_texture_from_surface(&surface)
@@ -47,12 +47,10 @@ fn render_message(message: &String, canvas: &mut Canvas<Window>, _state: &State,
 }
 
 fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
-    if state.cell_height <= 3 {
-        return
-    } else {
-        let i = (255 - (state.cell_height as i32 - 3) * 15) as u8;
-        canvas.set_draw_color(Color::RGB(i, i, i));
-    }
+    let mut color = config.grid_color.clone();
+    color.a = (state.cell_height as f32 / config.max_cell_height as f32 * 255.0).round() as u8;
+    canvas.set_draw_color(color);
+    canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
 
     let mut i: i32 = 0;
     let max_i: i32 = if config.window_height > config.window_width { config.window_height as i32 } else { config.window_width as i32 };
@@ -92,7 +90,7 @@ fn render_state(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
         while x < config.window_width as i32 {
             let coord = utils::screen_coord_to_game_coord(x, y, state);
             if state.cell_coords.contains(&coord) {
-                render_cell(canvas, state, &coord, Color::BLACK);
+                render_cell(canvas, state, &coord, config.cell_color);
             }
             x += state.cell_width as i32;
         }
@@ -100,13 +98,13 @@ fn render_state(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
     }
 }
 
-fn render_hover(canvas: &mut Canvas<Window>, state: &State) {
+fn render_hover(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
     let coord = utils::screen_coord_to_game_coord(
         state.cursor_x,
         state.cursor_y,
         state
     );
-    render_cell(canvas, state, &coord, Color::GRAY);
+    render_cell(canvas, state, &coord, config.hover_color);
 }
 
 fn render_cell(canvas: &mut Canvas<Window>, state: &State, coord: &Coord, color: Color) {

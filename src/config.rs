@@ -1,3 +1,5 @@
+use sdl2::pixels::Color;
+
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
 const MS_PER_UPDATE: f32 = 16.0;
@@ -9,6 +11,11 @@ const INITIAL_PAUSE_MS: f32 = 1000.0;
 const FONT_PATH: &'static str = "./ARCADECLASSIC.TTF";
 const CHAR_WIDTH: u32 = 30;
 const CHAR_HEIGHT: u32 = 50;
+const BACKGROUND_COLOR: Color = Color::WHITE;
+const GRID_COLOR: Color = Color::BLACK;
+const CELL_COLOR: Color = Color::BLACK;
+const FONT_COLOR: Color = Color::RGBA(255, 0, 0, 200);
+const HOVER_COLOR: Color = Color::GREY;
 
 #[derive(Debug)]
 pub struct Config {
@@ -23,6 +30,11 @@ pub struct Config {
     pub font_path: &'static str,
     pub char_width: u32,
     pub char_height: u32,
+    pub background_color: Color,
+    pub grid_color: Color,
+    pub cell_color: Color,
+    pub font_color: Color,
+    pub hover_color: Color,
 }
 
 impl Config {
@@ -39,6 +51,11 @@ impl Config {
             font_path: FONT_PATH,
             char_width: CHAR_WIDTH,
             char_height: CHAR_HEIGHT,
+            background_color: BACKGROUND_COLOR,
+            grid_color: GRID_COLOR,
+            cell_color: CELL_COLOR,
+            font_color: FONT_COLOR,
+            hover_color: HOVER_COLOR,
         }
     }
 }
