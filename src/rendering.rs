@@ -28,7 +28,7 @@ fn render_message(message: &String, canvas: &mut Canvas<Window>, _state: &State,
     let texture_creator = canvas.texture_creator();
     let surface = font
         .render(message)
-        .blended(Color::RGBA(255, 0, 0, 255))
+        .blended(Color::RGBA(255, 0, 0, 100))
         .map_err(|e| e.to_string())?;
     let texture = texture_creator
         .create_texture_from_surface(&surface)
