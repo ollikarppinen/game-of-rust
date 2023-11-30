@@ -99,6 +99,8 @@ fn render_state(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
 }
 
 fn render_hover(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
+    if state.cell_height < 5 { return }
+
     let coord = utils::screen_coord_to_game_coord(
         state.cursor_x,
         state.cursor_y,
