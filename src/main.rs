@@ -27,7 +27,7 @@ fn main() -> Result<(), String> {
     let mut state = state_mgmt::initial_state();
 
     // https://gafferongames.com/post/fix_your_timestep/
-    let mut accumulator = config.initial_pause_ms;
+    let mut accumulator = 0.0;
 
     while state.running {
         let frame_time = state.timestep.delta();

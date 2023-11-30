@@ -14,16 +14,61 @@ pub fn render(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> ()
     render_state(canvas, &state, &config);
     render_grid(canvas, &state, &config);
 
-    if state.paused {
-        render_blur(canvas, &state, &config);
-        let message: String = "Paused".to_string();
-        let _ = render_message(&message, canvas, &state, &config);
-    }
+    if state.t < config.intro_duration_ms { let _ = render_intro(canvas, &state, &config); }
+    if state.paused { render_paused(canvas, &state, &config) }
 
     canvas.present();
 }
 
-fn render_message(message: &String, canvas: &mut Canvas<Window>, _state: &State, config: &Config) -> Result<(), String> {
+fn render_intro(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> Result<(), String> {
+    let message: String = "Game of Rust".to_string();
+    let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string())?;
+    let font = ttf_context.load_font(config.font_path, 64)?;
+    let texture_creator = canvas.texture_creator();
+    let mut color = config.font_color.clone();
+    color.a = 255;
+    if state.t > config.intro_duration_ms / 2.0 {
+        let x = (255.0 * ((state.t - config.intro_duration_ms / 2.0) / (config.intro_duration_ms / 2.0))) as u8;
+        color.a -= x;
+    }
+    let surface = font
+        .render(&message)
+        .blended(color)
+        .map_err(|e| e.to_string())?;
+    let texture = texture_creator
+        .create_texture_from_surface(&surface)
+        .map_err(|e| e.to_string())?;
+    let message_width = message.len() as u32 * config.char_width;
+    let message_height = config.char_height;
+    let x = (config.window_width - message_width) as i32 / 2;
+    let y = (config.window_height - message_height) as i32 / 5;
+    let target = Rect::new(
+        x,
+        y,
+        message_width,
+        message_height
+    );
+    canvas.copy(&texture, None, Some(target))?;
+
+    Ok(())
+}
+
+fn render_paused(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> () {
+    render_blur(canvas, &state, &config);
+    let message: String = "Paused".to_string();
+    let _ = render_message_center(&message, canvas, &state, &config);
+}
+
+fn render_message_center(message: &String, canvas: &mut Canvas<Window>, _state: &State, config: &Config) -> Result<(), String> {
+    let message_width = message.len() as u32 * config.char_width;
+    let message_height = config.char_height;
+    let x = (config.window_width - message_width) as i32 / 2;
+    let y = (config.window_height - message_height) as i32 / 2;
+
+    render_message(message, x, y, canvas, _state, config)
+}
+
+fn render_message(message: &String, x: i32, y: i32, canvas: &mut Canvas<Window>, _state: &State, config: &Config) -> Result<(), String> {
     let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string())?;
     let font = ttf_context.load_font(config.font_path, 64)?;
     let texture_creator = canvas.texture_creator();
@@ -37,8 +82,8 @@ fn render_message(message: &String, canvas: &mut Canvas<Window>, _state: &State,
     let message_width = message.len() as u32 * config.char_width;
     let message_height = config.char_height;
     let target = Rect::new(
-        (config.window_width - message_width) as i32 / 2,
-        (config.window_height - message_height) as i32 / 2,
+        x,
+        y,
         message_width,
         message_height
     );

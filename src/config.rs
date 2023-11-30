@@ -7,7 +7,7 @@ const MIN_CELL_WIDTH: u32 = 1;
 const MIN_CELL_HEIGHT: u32 = 1;
 const MAX_CELL_WIDTH: u32 = 20;
 const MAX_CELL_HEIGHT: u32 = 20;
-const INITIAL_PAUSE_MS: f32 = 1000.0;
+const INTRO_DURATION_MS: f32 = 5000.0;
 const FONT_PATH: &'static str = "./ARCADECLASSIC.TTF";
 const CHAR_WIDTH: u32 = 30;
 const CHAR_HEIGHT: u32 = 50;
@@ -26,7 +26,7 @@ pub struct Config {
     pub min_cell_height: u32,
     pub max_cell_width: u32,
     pub max_cell_height: u32,
-    pub initial_pause_ms: f32,
+    pub intro_duration_ms: f32,
     pub font_path: &'static str,
     pub char_width: u32,
     pub char_height: u32,
@@ -47,7 +47,7 @@ impl Config {
             max_cell_width: MAX_CELL_WIDTH,
             min_cell_height: MIN_CELL_HEIGHT,
             max_cell_height: MAX_CELL_HEIGHT,
-            initial_pause_ms: INITIAL_PAUSE_MS,
+            intro_duration_ms: INTRO_DURATION_MS,
             font_path: FONT_PATH,
             char_width: CHAR_WIDTH,
             char_height: CHAR_HEIGHT,
