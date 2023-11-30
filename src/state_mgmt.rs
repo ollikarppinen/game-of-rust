@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 use crate::Coord;
+use crate::config::Config;
 use crate::state::State;
 
 pub fn initial_state() -> State {
@@ -27,15 +28,15 @@ pub fn initial_state() -> State {
     state
 }
 
-pub fn update(state: &mut State, dt: f32) -> () {
-    update_camera(state, state.t, dt);
-    update_cells(state, state.t, dt);
+pub fn update(state: &mut State, config: &Config) -> () {
+    update_camera(state, config);
+    update_cells(state, config);
 }
 
-fn update_cells(state: &mut State, t: f32, dt: f32) -> () {
+fn update_cells(state: &mut State, config: &Config) -> () {
     if state.paused { return }
     if state.t_since_last_cell_update < state.cell_update_interval {
-        state.t_since_last_cell_update += dt;
+        state.t_since_last_cell_update += config.dt;
         return
     }
 
@@ -52,7 +53,7 @@ fn update_cells(state: &mut State, t: f32, dt: f32) -> () {
     state.cell_coords = new_cell_coords;
 }
 
-fn update_camera(state: &mut State, t: f32, dt: f32) -> () {
+fn update_camera(state: &mut State, _config: &Config) -> () {
     state.camera_x_velocity += state.camera_x_acceleration;
     state.camera_y_velocity += state.camera_y_acceleration;
     state.camera_x_offset += state.camera_x_velocity as i32;

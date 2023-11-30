@@ -35,7 +35,7 @@ fn main() -> Result<(), String> {
 
         while accumulator >= config.dt {
             inputs::handle_inputs(&mut state, &mut event_pump, &config);
-            state_mgmt::update(&mut state, config.dt);
+            state_mgmt::update(&mut state, &config);
             state.t += config.dt;
             accumulator -= config.dt;
         }
