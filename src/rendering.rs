@@ -33,8 +33,8 @@ fn render_message(message: &String, canvas: &mut Canvas<Window>, _state: &State,
     let texture = texture_creator
         .create_texture_from_surface(&surface)
         .map_err(|e| e.to_string())?;
-    let message_width = message.len() as u32 * 30;
-    let message_height = 50;
+    let message_width = message.len() as u32 * config.char_width;
+    let message_height = config.char_height;
     let target = Rect::new(
         (config.window_width - message_width) as i32 / 2,
         (config.window_height - message_height) as i32 / 2,
