@@ -24,7 +24,7 @@ pub fn render(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> ()
 
 fn render_message(message: &String, canvas: &mut Canvas<Window>, _state: &State, config: &Config) -> Result<(), String> {
     let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string())?;
-    let font = ttf_context.load_font("./ARCADECLASSIC.TTF", 512)?;
+    let font = ttf_context.load_font(config.font_path, 64)?;
     let texture_creator = canvas.texture_creator();
     let surface = font
         .render(message)
