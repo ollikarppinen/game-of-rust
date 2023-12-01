@@ -53,7 +53,7 @@ fn update_cells(state: &mut State, config: &Config) -> () {
     state.cell_coords = new_cell_coords;
 }
 
-fn update_camera(state: &mut State, _config: &Config) -> () {
+fn update_camera(state: &mut State, config: &Config) -> () {
     state.camera_x_velocity += state.camera_x_acceleration;
     state.camera_y_velocity += state.camera_y_acceleration;
     state.camera_z_velocity += state.camera_z_acceleration;
@@ -62,8 +62,8 @@ fn update_camera(state: &mut State, _config: &Config) -> () {
 
     state.cell_width += state.camera_z_velocity;
     state.cell_height += state.camera_z_velocity;
-    if state.cell_width < 1.0 { state.cell_width = 1.0 }
-    if state.cell_width > 20.0 { state.cell_width = 20.0 }
-    if state.cell_height < 1.0 { state.cell_height = 1.0 }
-    if state.cell_height > 20.0 { state.cell_height = 20.0 }
+    if state.cell_width < config.min_cell_width { state.cell_width = config.min_cell_width }
+    if state.cell_width > config.max_cell_width { state.cell_width = config.max_cell_width }
+    if state.cell_height < config.min_cell_height { state.cell_height = config.min_cell_height }
+    if state.cell_height > config.max_cell_height { state.cell_height = config.max_cell_height }
 }
