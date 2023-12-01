@@ -103,17 +103,17 @@ fn render_blur(canvas: &mut Canvas<Window>, _state: &State, config: &Config) {
 
 fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
     let mut color = config.grid_color.clone();
-    color.a = (state.cell_height as f32 / config.max_cell_height as f32 * 255.0).round() as u8;
+    color.a = (state.cell_height / config.max_cell_height * 255.0).round() as u8;
     canvas.set_draw_color(color);
     canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
 
     let mut i: i32 = 0;
     let max_i: i32 = if config.window_height > config.window_width { config.window_height as i32 } else { config.window_width as i32 };
-    let di: i32 = if config.window_height > config.window_width { state.cell_width as i32 } else { state.cell_height as i32 };
+    let di: i32 = if config.window_height > config.window_width { state.cell_height.round() as i32 } else { state.cell_width.round() as i32 };
     while i < max_i {
         let coord = utils::screen_coord_to_game_coord(i, i, state);
-        let x = coord.x * state.cell_width as i32 - state.camera_x_offset;
-        let y = coord.y * state.cell_height as i32 - state.camera_y_offset;
+        let x = coord.x * state.cell_width.round() as i32 - state.camera_x_offset;
+        let y = coord.y * state.cell_height.round() as i32 - state.camera_y_offset;
         canvas.draw_line(
             Point::new(
                 x,
@@ -147,9 +147,9 @@ fn render_state(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
             if state.cell_coords.contains(&coord) {
                 render_cell(canvas, state, &coord, config.cell_color);
             }
-            x += state.cell_width as i32;
+            x += state.cell_width.round() as i32;
         }
-        y += state.cell_height as i32;
+        y += state.cell_height.round() as i32;
     }
 }
 
@@ -165,8 +165,8 @@ fn render_hover(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
 }
 
 fn render_cell(canvas: &mut Canvas<Window>, state: &State, coord: &Coord, color: Color) {
-    let x = coord.x * state.cell_width as i32 - state.camera_x_offset;
-    let y = coord.y * state.cell_height as i32 - state.camera_y_offset;
+    let x = coord.x * state.cell_width.round() as i32 - state.camera_x_offset;
+    let y = coord.y * state.cell_height.round() as i32 - state.camera_y_offset;
     canvas.set_draw_color(color);
-    canvas.fill_rect(Rect::new(x, y, state.cell_width as u32, state.cell_height as u32)).expect("could not fill rect");
+    canvas.fill_rect(Rect::new(x, y, state.cell_width.round() as u32, state.cell_height.round() as u32)).expect("could not fill rect");
 }
