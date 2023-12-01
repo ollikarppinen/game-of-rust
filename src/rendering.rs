@@ -112,8 +112,8 @@ fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
     let di: i32 = if config.window_height > config.window_width { state.cell_height.round() as i32 } else { state.cell_width.round() as i32 };
     while i < max_i {
         let coord = utils::screen_coord_to_game_coord(i, i, state);
-        let x = coord.x * state.cell_width.round() as i32 - state.camera_x_offset;
-        let y = coord.y * state.cell_height.round() as i32 - state.camera_y_offset;
+        let x = coord.x * state.cell_width.round() as i32 - state.camera_x_offset.round() as i32;
+        let y = coord.y * state.cell_height.round() as i32 - state.camera_y_offset.round() as i32;
         canvas.draw_line(
             Point::new(
                 x,
@@ -165,8 +165,8 @@ fn render_hover(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
 }
 
 fn render_cell(canvas: &mut Canvas<Window>, state: &State, coord: &Coord, color: Color) {
-    let x = coord.x * state.cell_width.round() as i32 - state.camera_x_offset;
-    let y = coord.y * state.cell_height.round() as i32 - state.camera_y_offset;
+    let x = coord.x * state.cell_width.round() as i32 - state.camera_x_offset.round() as i32;
+    let y = coord.y * state.cell_height.round() as i32 - state.camera_y_offset.round() as i32;
     canvas.set_draw_color(color);
     canvas.fill_rect(Rect::new(x, y, state.cell_width.round() as u32, state.cell_height.round() as u32)).expect("could not fill rect");
 }

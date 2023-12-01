@@ -103,9 +103,8 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
             //     state.camera_y_offset += (old_center_coord.y - new_center_coord.y) * state.cell_height.round() as i32;
             // },
             Event::KeyDown { keycode: Some(Keycode::R), .. } => {
-                state.reset();
-                state.camera_x_offset = 0;
-                state.camera_y_offset = 0;
+                state.reset_cell_coords();
+                state.reset_camera_offset();
             },
             Event::KeyDown { keycode: Some(Keycode::P), .. } => {
                 for coord in &state.cell_coords {

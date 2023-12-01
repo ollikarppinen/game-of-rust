@@ -57,8 +57,8 @@ fn update_camera(state: &mut State, _config: &Config) -> () {
     state.camera_x_velocity += state.camera_x_acceleration;
     state.camera_y_velocity += state.camera_y_acceleration;
     state.camera_z_velocity += state.camera_z_acceleration;
-    state.camera_x_offset += state.camera_x_velocity as i32;
-    state.camera_y_offset += state.camera_y_velocity as i32;
+    state.camera_x_offset += state.camera_x_velocity;
+    state.camera_y_offset += state.camera_y_velocity;
 
     state.cell_width += state.camera_z_velocity;
     state.cell_height += state.camera_z_velocity;

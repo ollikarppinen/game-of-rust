@@ -2,8 +2,8 @@ use std::collections::HashSet;
 
 use crate::{Coord, timestep::TimeStep};
 
-const INITIAL_X_OFFSET: i32 = 0;
-const INITIAL_Y_OFFSET: i32 = 0;
+const INITIAL_X_OFFSET: f32 = 0.0;
+const INITIAL_Y_OFFSET: f32 = 0.0;
 const INITIAL_CELL_UPDATE_INTERVAL: f32 = 100.0;
 const INITIAL_CELL_WIDTH: f32 = 10.0;
 const INITIAL_CELL_HEIGHT: f32 = 10.0;
@@ -12,12 +12,12 @@ pub struct State {
     pub cell_coords: HashSet<Coord>,
     pub cell_update_interval: f32,
     pub t_since_last_cell_update: f32,
-    pub camera_x_offset: i32,
-    pub camera_y_offset: i32,
     pub cursor_x: i32,
     pub cursor_y: i32,
     pub running: bool,
     pub paused: bool,
+    pub camera_x_offset: f32,
+    pub camera_y_offset: f32,
     pub camera_x_velocity: f32,
     pub camera_y_velocity: f32,
     pub camera_z_velocity: f32,
@@ -55,8 +55,13 @@ impl State {
         }
     }
 
-    pub fn reset(&mut self) {
+    pub fn reset_cell_coords(&mut self) {
         self.cell_coords = HashSet::new();
+    }
+
+    pub fn reset_camera_offset(&mut self) {
+        self.camera_x_offset = INITIAL_X_OFFSET;
+        self.camera_y_offset = INITIAL_Y_OFFSET;
     }
 
     pub fn is_live(&self, coord: &Coord) -> bool {
