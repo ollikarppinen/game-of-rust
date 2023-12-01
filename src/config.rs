@@ -3,10 +3,10 @@ use sdl2::pixels::Color;
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 600;
 const MS_PER_UPDATE: f32 = 16.0;
-const MIN_CELL_WIDTH: u32 = 1;
-const MIN_CELL_HEIGHT: u32 = 1;
-const MAX_CELL_WIDTH: u32 = 20;
-const MAX_CELL_HEIGHT: u32 = 20;
+const MIN_CELL_WIDTH: f32 = 1.0;
+const MIN_CELL_HEIGHT: f32 = 1.0;
+const MAX_CELL_WIDTH: f32 = 20.0;
+const MAX_CELL_HEIGHT: f32 = 20.0;
 const INTRO_DURATION_MS: f32 = 5000.0;
 const FONT_PATH: &'static str = "./ARCADECLASSIC.TTF";
 const CHAR_WIDTH: u32 = 30;
@@ -22,10 +22,10 @@ pub struct Config {
     pub window_width: u32,
     pub window_height: u32,
     pub dt: f32,
-    pub min_cell_width: u32,
-    pub min_cell_height: u32,
-    pub max_cell_width: u32,
-    pub max_cell_height: u32,
+    pub min_cell_width: f32,
+    pub min_cell_height: f32,
+    pub max_cell_width: f32,
+    pub max_cell_height: f32,
     pub intro_duration_ms: f32,
     pub font_path: &'static str,
     pub char_width: u32,

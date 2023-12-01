@@ -5,8 +5,8 @@ use crate::{Coord, timestep::TimeStep};
 const INITIAL_X_OFFSET: i32 = 0;
 const INITIAL_Y_OFFSET: i32 = 0;
 const INITIAL_CELL_UPDATE_INTERVAL: f32 = 100.0;
-const INITIAL_CELL_WIDTH: u32 = 10;
-const INITIAL_CELL_HEIGHT: u32 = 10;
+const INITIAL_CELL_WIDTH: f32 = 10.0;
+const INITIAL_CELL_HEIGHT: f32 = 10.0;
 
 pub struct State {
     pub cell_coords: HashSet<Coord>,
@@ -22,8 +22,8 @@ pub struct State {
     pub camera_y_velocity: f32,
     pub camera_x_acceleration: f32,
     pub camera_y_acceleration: f32,
-    pub cell_width: u32,
-    pub cell_height: u32,
+    pub cell_width: f32,
+    pub cell_height: f32,
     pub t: f32,
     pub timestep: TimeStep
 }

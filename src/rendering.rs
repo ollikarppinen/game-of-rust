@@ -92,7 +92,7 @@ fn render_message(message: &String, x: i32, y: i32, canvas: &mut Canvas<Window>,
     Ok(())
 }
 
-fn render_blur(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
+fn render_blur(canvas: &mut Canvas<Window>, _state: &State, config: &Config) {
     let mut color = config.background_color.clone();
     color.a = 50;
 
@@ -154,7 +154,7 @@ fn render_state(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
 }
 
 fn render_hover(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
-    if state.cell_height < 5 { return }
+    if state.cell_height < 5.0 { return }
 
     let coord = utils::screen_coord_to_game_coord(
         state.cursor_x,
@@ -168,5 +168,5 @@ fn render_cell(canvas: &mut Canvas<Window>, state: &State, coord: &Coord, color:
     let x = coord.x * state.cell_width as i32 - state.camera_x_offset;
     let y = coord.y * state.cell_height as i32 - state.camera_y_offset;
     canvas.set_draw_color(color);
-    canvas.fill_rect(Rect::new(x, y, state.cell_width, state.cell_height)).expect("could not fill rect");
+    canvas.fill_rect(Rect::new(x, y, state.cell_width as u32, state.cell_height as u32)).expect("could not fill rect");
 }

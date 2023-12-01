@@ -20,14 +20,14 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
     }
 
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) {
-        if state.camera_y_acceleration < 5.0 { state.camera_x_acceleration += 0.02 }
+        if state.camera_x_acceleration < 5.0 { state.camera_x_acceleration += 0.02 }
     } else if state.camera_x_acceleration > 0.0 {
         state.camera_x_acceleration = 0.0;
         state.camera_x_velocity = 0.0;
     }
 
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) {
-        if state.camera_y_acceleration > -5.0 { state.camera_x_acceleration -= 0.02 }
+        if state.camera_x_acceleration > -5.0 { state.camera_x_acceleration -= 0.02 }
     } else if state.camera_x_acceleration < 0.0 {
         state.camera_x_acceleration = 0.0;
         state.camera_x_velocity = 0.0;
@@ -60,8 +60,8 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                     (config.window_height as f32 / 2.0).round() as i32,
                     state
                 );
-                if state.cell_width > config.min_cell_width { state.cell_width -= 1 }
-                if state.cell_height > config.min_cell_height { state.cell_height -= 1 }
+                if state.cell_width > config.min_cell_width { state.cell_width -= 1.0 }
+                if state.cell_height > config.min_cell_height { state.cell_height -= 1.0 }
                 let new_center_coord = utils::screen_coord_to_game_coord(
                     (config.window_width as f32 / 2.0).round() as i32,
                     (config.window_height as f32 / 2.0).round() as i32,
@@ -78,8 +78,8 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                     (config.window_height as f32 / 2.0).round() as i32,
                     state
                 );
-                if state.cell_width < config.max_cell_width { state.cell_width += 1 }
-                if state.cell_height < config.max_cell_height { state.cell_height += 1 }
+                if state.cell_width < config.max_cell_width { state.cell_width += 1.0 }
+                if state.cell_height < config.max_cell_height { state.cell_height += 1.0 }
                 let new_center_coord = utils::screen_coord_to_game_coord(
                     (config.window_width as f32 / 2.0).round() as i32,
                     (config.window_height as f32 / 2.0).round() as i32,
