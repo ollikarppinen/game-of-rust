@@ -7,18 +7,28 @@ use crate::{Config, utils, state::State};
 pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config: &Config) -> () {
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) {
         if state.camera_y_acceleration < 5.0 { state.camera_y_acceleration += 0.02 }
-    } else if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) {
+    } else if state.camera_y_acceleration > 0.0 {
+        state.camera_y_acceleration = 0.0;
+        state.camera_y_velocity = 0.0;
+    }
+
+    if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) {
         if state.camera_y_acceleration > -5.0 { state.camera_y_acceleration -= 0.02 }
-    } else {
+    } else if state.camera_y_acceleration < 0.0 {
         state.camera_y_acceleration = 0.0;
         state.camera_y_velocity = 0.0;
     }
 
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) {
         if state.camera_y_acceleration < 5.0 { state.camera_x_acceleration += 0.02 }
-    } else if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) {
+    } else if state.camera_x_acceleration > 0.0 {
+        state.camera_x_acceleration = 0.0;
+        state.camera_x_velocity = 0.0;
+    }
+
+    if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) {
         if state.camera_y_acceleration > -5.0 { state.camera_x_acceleration -= 0.02 }
-    } else {
+    } else if state.camera_x_acceleration < 0.0 {
         state.camera_x_acceleration = 0.0;
         state.camera_x_velocity = 0.0;
     }
