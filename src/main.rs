@@ -15,7 +15,7 @@ fn main() -> Result<(), String> {
     let video_subsystem = sdl_context.video()?;
 
     let config = Config::new();
-    let window = video_subsystem.window("game-of-rust", config.window_width, config.window_height)
+    let window = video_subsystem.window("game-of-rust", config.window_width as u32, config.window_height as u32)
         .position_centered()
         .build()
         .expect("could not initialize video subsystem");

@@ -38,15 +38,15 @@ fn render_intro(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> 
     let texture = texture_creator
         .create_texture_from_surface(&surface)
         .map_err(|e| e.to_string())?;
-    let message_width = message.len() as u32 * config.char_width;
+    let message_width = message.len() as f32 * config.char_width;
     let message_height = config.char_height;
     let x = (config.window_width - message_width) as i32 / 2;
     let y = (config.window_height - message_height) as i32 / 5;
     let target = Rect::new(
         x,
         y,
-        message_width,
-        message_height
+        message_width as u32,
+        message_height as u32
     );
     canvas.copy(&texture, None, Some(target))?;
 
@@ -60,7 +60,7 @@ fn render_paused(canvas: &mut Canvas<Window>, state: &State, config: &Config) ->
 }
 
 fn render_message_center(message: &String, canvas: &mut Canvas<Window>, _state: &State, config: &Config) -> Result<(), String> {
-    let message_width = message.len() as u32 * config.char_width;
+    let message_width = message.len() as f32 * config.char_width;
     let message_height = config.char_height;
     let x = (config.window_width - message_width) as i32 / 2;
     let y = (config.window_height - message_height) as i32 / 2;
@@ -79,13 +79,13 @@ fn render_message(message: &String, x: i32, y: i32, canvas: &mut Canvas<Window>,
     let texture = texture_creator
         .create_texture_from_surface(&surface)
         .map_err(|e| e.to_string())?;
-    let message_width = message.len() as u32 * config.char_width;
+    let message_width = message.len() as f32 * config.char_width;
     let message_height = config.char_height;
     let target = Rect::new(
         x,
         y,
-        message_width,
-        message_height
+        message_width as u32,
+        message_height as u32
     );
     canvas.copy(&texture, None, Some(target))?;
 
@@ -98,7 +98,7 @@ fn render_blur(canvas: &mut Canvas<Window>, _state: &State, config: &Config) {
 
     canvas.set_draw_color(color);
     canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
-    canvas.fill_rect(Rect::new(0, 0, config.window_width, config.window_height)).expect("could not fill rect");
+    canvas.fill_rect(Rect::new(0, 0, config.window_width as u32, config.window_height as u32)).expect("could not fill rect");
 }
 
 fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {

@@ -1,7 +1,7 @@
 use sdl2::pixels::Color;
 
-const WINDOW_WIDTH: u32 = 800;
-const WINDOW_HEIGHT: u32 = 600;
+const WINDOW_WIDTH: f32 = 800.0;
+const WINDOW_HEIGHT: f32 = 600.0;
 const MS_PER_UPDATE: f32 = 16.0;
 const MIN_CELL_WIDTH: f32 = 1.0;
 const MIN_CELL_HEIGHT: f32 = 1.0;
@@ -9,8 +9,8 @@ const MAX_CELL_WIDTH: f32 = 100.0;
 const MAX_CELL_HEIGHT: f32 = 100.0;
 const INTRO_DURATION_MS: f32 = 5000.0;
 const FONT_PATH: &'static str = "./ARCADECLASSIC.TTF";
-const CHAR_WIDTH: u32 = 30;
-const CHAR_HEIGHT: u32 = 50;
+const CHAR_WIDTH: f32 = 30.0;
+const CHAR_HEIGHT: f32 = 50.0;
 const BACKGROUND_COLOR: Color = Color::WHITE;
 const GRID_COLOR: Color = Color::BLACK;
 const CELL_COLOR: Color = Color::BLACK;
@@ -20,8 +20,8 @@ const CAMERA_XY_ACCELERATION: f32 = 0.05;
 
 #[derive(Debug)]
 pub struct Config {
-    pub window_width: u32,
-    pub window_height: u32,
+    pub window_width: f32,
+    pub window_height: f32,
     pub dt: f32,
     pub min_cell_width: f32,
     pub min_cell_height: f32,
@@ -29,8 +29,8 @@ pub struct Config {
     pub max_cell_height: f32,
     pub intro_duration_ms: f32,
     pub font_path: &'static str,
-    pub char_width: u32,
-    pub char_height: u32,
+    pub char_width: f32,
+    pub char_height: f32,
     pub background_color: Color,
     pub grid_color: Color,
     pub cell_color: Color,
