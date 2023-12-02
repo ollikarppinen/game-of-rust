@@ -107,13 +107,11 @@ fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
     canvas.set_draw_color(color);
     canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
 
-    let mut i: i32 = 0;
-    let max_i: i32 = if config.window_height > config.window_width { config.window_height as i32 } else { config.window_width as i32 };
-    let di: i32 = if config.window_height > config.window_width { state.cell_height.round() as i32 } else { state.cell_width.round() as i32 };
-    while i < max_i {
-        let coord = utils::screen_coord_to_game_coord(i, i, state);
-        let x = coord.x * state.cell_width.round() as i32 - state.camera_x_offset.round() as i32;
-        let y = coord.y * state.cell_height.round() as i32 - state.camera_y_offset.round() as i32;
+    let coord = utils::screen_coord_to_game_coord(0, 0, state);
+    let mut x = coord.x * state.cell_width.round() as i32 - state.camera_x_offset.round() as i32;
+    let mut y = coord.y * state.cell_height.round() as i32 - state.camera_y_offset.round() as i32;
+
+    while x < config.window_width as i32 {
         canvas.draw_line(
             Point::new(
                 x,
@@ -124,6 +122,9 @@ fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
                 config.window_height as i32
             )
         ).expect("could not draw line");
+        x += state.cell_width as i32;
+    }
+    while y < config.window_height as i32 {
         canvas.draw_line(
             Point::new(
                 0,
@@ -134,7 +135,8 @@ fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
                 y
             )
         ).expect("could not draw line");
-        i += di;
+
+        y += state.cell_height as i32;
     }
 }
 
