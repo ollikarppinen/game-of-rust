@@ -2,8 +2,6 @@ use sdl2::{keyboard::{self, Keycode}, event::Event};
 
 use crate::{Config, utils, state::State};
 
-// pub mod utils;
-
 pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config: &Config) -> () {
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) {
         if state.camera_y_acceleration < 5.0 { state.camera_y_acceleration += config.camera_xy_acceleration }
@@ -76,8 +74,8 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                 }
             },
             Event::KeyDown { keycode: Some(Keycode::C), .. } => {
-                println!("x offset: {}", state.camera_x_offset);
-                println!("y offset: {}", state.camera_y_offset);
+                println!("x offset: {}", state.camera_position_x);
+                println!("y offset: {}", state.camera_position_y);
                 println!("cell size: {}", state.cell_width);
                 let center_x = config.window_width as f32 / state.cell_width;
                 println!("center x: {}", center_x);
@@ -89,7 +87,7 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
             },
             Event::MouseButtonDown { x, y, .. } => {
                 let coord = utils::screen_coord_to_game_coord(x, y, state);
-                println!("x: {}, y: {}, offset x: {}, offset y: {}, coord: {}", x, y, state.camera_x_offset, state.camera_y_offset, coord);
+                println!("x: {}, y: {}, offset x: {}, offset y: {}, coord: {}", x, y, state.camera_position_x, state.camera_position_y, coord);
                 if state.cell_coords.contains(&coord) {
                     state.cell_coords.remove(&coord);
                 } else {

@@ -16,8 +16,8 @@ pub struct State {
     pub cursor_y: i32,
     pub running: bool,
     pub paused: bool,
-    pub camera_x_offset: f32,
-    pub camera_y_offset: f32,
+    pub camera_position_x: f32,
+    pub camera_position_y: f32,
     pub camera_x_velocity: f32,
     pub camera_y_velocity: f32,
     pub camera_z_velocity: f32,
@@ -36,8 +36,8 @@ impl State {
             cell_coords: HashSet::new(),
             cell_update_interval: INITIAL_CELL_UPDATE_INTERVAL,
             t_since_last_cell_update: 0.0,
-            camera_x_offset: INITIAL_X_OFFSET,
-            camera_y_offset: INITIAL_Y_OFFSET,
+            camera_position_x: INITIAL_X_OFFSET,
+            camera_position_y: INITIAL_Y_OFFSET,
             cursor_x: 0,
             cursor_y: 0,
             running: true,
@@ -60,8 +60,8 @@ impl State {
     }
 
     pub fn reset_camera_offset(&mut self) {
-        self.camera_x_offset = INITIAL_X_OFFSET;
-        self.camera_y_offset = INITIAL_Y_OFFSET;
+        self.camera_position_x = INITIAL_X_OFFSET;
+        self.camera_position_y = INITIAL_Y_OFFSET;
     }
 
     pub fn is_live(&self, coord: &Coord) -> bool {
