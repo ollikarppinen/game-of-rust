@@ -61,47 +61,10 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
             },
             Event::KeyDown { keycode: Some(Keycode::Plus), .. } => {
                 if state.cell_update_interval > config.dt { state.cell_update_interval /= 2.0 }
-                println!("dt: {}", config.dt);
             },
             Event::KeyDown { keycode: Some(Keycode::Minus), .. } => {
                 if state.cell_update_interval < 5000.0 { state.cell_update_interval *= 2.0 }
-                println!("dt: {}", config.dt);
             },
-            // Event::KeyDown { keycode: Some(Keycode::Z), .. } => {
-            //     // ZOOM OUT
-            //     let old_center_coord = utils::screen_coord_to_game_coord(
-            //         (config.window_width as f32 / 2.0).round() as i32,
-            //         (config.window_height as f32 / 2.0).round() as i32,
-            //         state
-            //     );
-            //     if state.cell_width > config.min_cell_width { state.cell_width -= 1.0 }
-            //     if state.cell_height > config.min_cell_height { state.cell_height -= 1.0 }
-            //     let new_center_coord = utils::screen_coord_to_game_coord(
-            //         (config.window_width as f32 / 2.0).round() as i32,
-            //         (config.window_height as f32 / 2.0).round() as i32,
-            //         state
-            //     );
-
-            //     state.camera_x_offset += (old_center_coord.x - new_center_coord.x) * state.cell_width.round() as i32;
-            //     state.camera_y_offset += (old_center_coord.y - new_center_coord.y) * state.cell_height.round() as i32;
-            // },
-            // Event::KeyDown { keycode: Some(Keycode::X), .. } => {
-            //     // ZOOM IN
-            //     let old_center_coord = utils::screen_coord_to_game_coord(
-            //         (config.window_width as f32 / 2.0).round() as i32,
-            //         (config.window_height as f32 / 2.0).round() as i32,
-            //         state
-            //     );
-            //     if state.cell_width < config.max_cell_width { state.cell_width += 1.0 }
-            //     if state.cell_height < config.max_cell_height { state.cell_height += 1.0 }
-            //     let new_center_coord = utils::screen_coord_to_game_coord(
-            //         (config.window_width as f32 / 2.0).round() as i32,
-            //         (config.window_height as f32 / 2.0).round() as i32,
-            //         state
-            //     );
-            //     state.camera_x_offset += (old_center_coord.x - new_center_coord.x) * state.cell_width.round() as i32;
-            //     state.camera_y_offset += (old_center_coord.y - new_center_coord.y) * state.cell_height.round() as i32;
-            // },
             Event::KeyDown { keycode: Some(Keycode::R), .. } => {
                 state.reset_cell_coords();
                 state.reset_camera_offset();
@@ -120,8 +83,6 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                 println!("center x: {}", center_x);
                 let center_y = config.window_height as f32 / state.cell_height;
                 println!("center y: {}", center_y);
-
-                // ((w_width / old_c_width) - (w_width / new_c_width)) * new_c_width
             },
             Event::KeyDown { keycode: Some(Keycode::F), .. } => {
                 println!("FPS: {}", state.timestep.frame_rate().unwrap_or(0));
