@@ -112,6 +112,17 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                     println!("{}", coord.y);
                 }
             },
+            Event::KeyDown { keycode: Some(Keycode::C), .. } => {
+                println!("x offset: {}", state.camera_x_offset);
+                println!("y offset: {}", state.camera_y_offset);
+                println!("cell size: {}", state.cell_width);
+                let center_x = config.window_width as f32 / state.cell_width;
+                println!("center x: {}", center_x);
+                let center_y = config.window_height as f32 / state.cell_height;
+                println!("center y: {}", center_y);
+
+                // ((w_width / old_c_width) - (w_width / new_c_width)) * new_c_width
+            },
             Event::KeyDown { keycode: Some(Keycode::F), .. } => {
                 println!("FPS: {}", state.timestep.frame_rate().unwrap_or(0));
             },
