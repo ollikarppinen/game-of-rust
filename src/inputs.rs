@@ -4,40 +4,19 @@ use crate::{Config, utils::{self}, state::State};
 
 pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config: &Config) -> () {
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) {
-        if state.camera_y_acceleration < config.camera_xy_acceleration_max {
-            state.camera_y_acceleration = (state.camera_y_acceleration + config.camera_xy_acceleration).min(config.camera_xy_acceleration_max);
-        }
-        if state.camera_y_acceleration < 5.0 { state.camera_y_acceleration += config.camera_xy_acceleration }
-    } else if state.camera_y_acceleration > 0.0 {
-        state.camera_y_acceleration = 0.0;
-        state.camera_y_velocity = 0.0;
-    }
-
-    if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) {
-        if state.camera_y_acceleration > -config.camera_xy_acceleration_max {
-            state.camera_y_acceleration = (state.camera_y_acceleration - config.camera_xy_acceleration).max(-config.camera_xy_acceleration_max);
-        }
-    } else if state.camera_y_acceleration < 0.0 {
-        state.camera_y_acceleration = 0.0;
-        state.camera_y_velocity = 0.0;
+        state.camera_y_i = 1.0
+    } else if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Up) {
+        state.camera_y_i = -1.0
+    } else {
+        state.camera_y_i = 0.0
     }
 
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Right) {
-        if state.camera_x_acceleration < config.camera_xy_acceleration_max {
-            state.camera_x_acceleration = (state.camera_x_acceleration + config.camera_xy_acceleration).min(config.camera_xy_acceleration_max);
-        }
-    } else if state.camera_x_acceleration > 0.0 {
-        state.camera_x_acceleration = 0.0;
-        state.camera_x_velocity = 0.0;
-    }
-
-    if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) {
-        if state.camera_x_acceleration > -config.camera_xy_acceleration_max {
-            state.camera_x_acceleration = (state.camera_x_acceleration - config.camera_xy_acceleration).max(-config.camera_xy_acceleration_max);
-        }
-    } else if state.camera_x_acceleration < 0.0 {
-        state.camera_x_acceleration = 0.0;
-        state.camera_x_velocity = 0.0;
+        state.camera_x_i = 1.0
+    } else if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Left) {
+        state.camera_x_i = -1.0
+    } else {
+        state.camera_x_i = 0.0
     }
 
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Z) {

@@ -19,7 +19,10 @@ pub struct State {
     pub paused: bool,
     pub camera_x: f32,
     pub camera_y: f32,
-    pub camera_position_z: f32,
+    pub camera_z: f32,
+    pub camera_x_i: f32,
+    pub camera_y_i: f32,
+    pub camera_z_i: f32,
     pub camera_x_velocity: f32,
     pub camera_y_velocity: f32,
     pub camera_z_velocity: f32,
@@ -45,7 +48,10 @@ impl State {
             paused: true,
             camera_x: INITIAL_CAMERA_X,
             camera_y: INITIAL_CAMERA_Y,
-            camera_position_z: INITIAL_CAMERA_Z,
+            camera_z: INITIAL_CAMERA_Z,
+            camera_x_i: 0.0,
+            camera_y_i: 0.0,
+            camera_z_i: 0.0,
             camera_x_velocity: 0.0,
             camera_y_velocity: 0.0,
             camera_z_velocity: 0.0,
@@ -67,7 +73,7 @@ impl State {
     pub fn reset_camera(&mut self) {
         self.camera_x = INITIAL_CAMERA_X;
         self.camera_y = INITIAL_CAMERA_Y;
-        self.camera_position_z = INITIAL_CAMERA_Z;
+        self.camera_z = INITIAL_CAMERA_Z;
         self.cell_width = INITIAL_CELL_WIDTH;
         self.cell_height = INITIAL_CELL_HEIGHT;
     }

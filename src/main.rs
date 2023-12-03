@@ -34,10 +34,10 @@ fn main() -> Result<(), String> {
         accumulator += frame_time;
         inputs::handle_inputs(&mut state, &mut event_pump, &config);
         state_mgmt::update_fps(&mut state, &config);
-        state_mgmt::update_camera(&mut state, &config);
 
         while accumulator >= config.dt {
             state_mgmt::update(&mut state, &config);
+            state_mgmt::update_camera(&mut state, &config);
             state.t += config.dt;
             accumulator -= config.dt;
         }

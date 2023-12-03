@@ -60,11 +60,29 @@ fn update_cells(state: &mut State, config: &Config) -> () {
 }
 
 pub fn update_camera(state: &mut State, config: &Config) -> () {
-    state.camera_x_velocity += state.camera_x_acceleration;
-    state.camera_y_velocity += state.camera_y_acceleration;
+    if state.camera_x_i != 0.0 {
+        if state.camera_x_acceleration < config.camera_xy_acceleration_max {
+            state.camera_x_acceleration = (state.camera_x_acceleration + config.camera_xy_acceleration).min(config.camera_xy_acceleration_max);
+        }
+        state.camera_x_velocity += state.camera_x_acceleration;
+    } else {
+        state.camera_x_acceleration = 0.0;
+        state.camera_x_velocity = 0.0;
+    }
+    state.camera_x += state.camera_x_velocity * state.camera_x_i;
+
+    if state.camera_y_i != 0.0 {
+        if state.camera_y_acceleration < config.camera_xy_acceleration_max {
+            state.camera_y_acceleration = (state.camera_y_acceleration + config.camera_xy_acceleration).min(config.camera_xy_acceleration_max);
+        }
+        state.camera_y_velocity += state.camera_y_acceleration;
+    } else {
+        state.camera_y_acceleration = 0.0;
+        state.camera_y_velocity = 0.0;
+    }
+    state.camera_y += state.camera_y_velocity * state.camera_y_i;
+
     state.camera_z_velocity += state.camera_z_acceleration;
-    state.camera_x += state.camera_x_velocity;
-    state.camera_y += state.camera_y_velocity;
 
     let old_cell_width = state.cell_width.clone();
     let old_cell_height = state.cell_height.clone();
