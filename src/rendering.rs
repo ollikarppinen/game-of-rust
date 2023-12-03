@@ -109,8 +109,8 @@ fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
 
     let dx: f32 = state.cell_width;
     let dy: f32 = state.cell_height;
-    let mut x: f32 = state.camera_position_x % dx;
-    let mut y: f32 = state.camera_position_y % dy;
+    let mut x: f32 = state.camera_x % dx;
+    let mut y: f32 = state.camera_y % dy;
     if x < 0.0 { x = -x } else { x = dx - x }
     if y < 0.0 { y = -y } else { y = dy - y  }
     let max_x = config.window_width;
@@ -155,8 +155,8 @@ fn render_hover(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
 }
 
 fn render_cell(canvas: &mut Canvas<Window>, state: &State, coord: &Coord, color: Color) {
-    let x = coord.x as f32 * state.cell_width - state.camera_position_x;
-    let y = coord.y as f32 * state.cell_height - state.camera_position_y;
+    let x = coord.x as f32 * state.cell_width - state.camera_x;
+    let y = coord.y as f32 * state.cell_height - state.camera_y;
     canvas.set_draw_color(color);
     canvas.fill_rect(Rect::new(x.ceil() as i32, y.ceil() as i32, state.cell_width.ceil() as u32, state.cell_height.ceil() as u32)).expect("could not fill rect");
 }

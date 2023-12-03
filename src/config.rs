@@ -17,6 +17,11 @@ const CELL_COLOR: Color = Color::BLACK;
 const FONT_COLOR: Color = Color::RGBA(255, 0, 0, 200);
 const HOVER_COLOR: Color = Color::GREY;
 const CAMERA_XY_ACCELERATION: f32 = 0.05;
+const CAMERA_XY_ACCELERATION_MAX: f32 = 5.0;
+const CAMERA_XY_VELOCITY_MAX: f32 = 5.0;
+const CAMERA_Z_ACCELERATION: f32 = 0.005;
+const CAMERA_Z_ACCELERATION_MAX: f32 = 0.05;
+const CAMERA_Z_VELOCITY_MAX: f32 = 0.1;
 
 #[derive(Debug)]
 pub struct Config {
@@ -37,6 +42,11 @@ pub struct Config {
     pub font_color: Color,
     pub hover_color: Color,
     pub camera_xy_acceleration: f32,
+    pub camera_xy_acceleration_max: f32,
+    pub camera_xy_velocity_max: f32,
+    pub camera_z_acceleration: f32,
+    pub camera_z_acceleration_max: f32,
+    pub camera_z_velocity_max: f32,
 }
 
 impl Config {
@@ -59,6 +69,11 @@ impl Config {
             font_color: FONT_COLOR,
             hover_color: HOVER_COLOR,
             camera_xy_acceleration: CAMERA_XY_ACCELERATION,
+            camera_xy_acceleration_max: CAMERA_XY_ACCELERATION_MAX,
+            camera_xy_velocity_max: CAMERA_XY_VELOCITY_MAX,
+            camera_z_acceleration: CAMERA_Z_ACCELERATION,
+            camera_z_acceleration_max: CAMERA_Z_ACCELERATION_MAX,
+            camera_z_velocity_max: CAMERA_Z_VELOCITY_MAX,
         }
     }
 }

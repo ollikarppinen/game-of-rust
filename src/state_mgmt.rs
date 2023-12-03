@@ -57,8 +57,8 @@ fn update_camera(state: &mut State, config: &Config) -> () {
     state.camera_x_velocity += state.camera_x_acceleration;
     state.camera_y_velocity += state.camera_y_acceleration;
     state.camera_z_velocity += state.camera_z_acceleration;
-    state.camera_position_x += state.camera_x_velocity;
-    state.camera_position_y += state.camera_y_velocity;
+    state.camera_x += state.camera_x_velocity;
+    state.camera_y += state.camera_y_velocity;
 
     let old_cell_width = state.cell_width.clone();
     let old_cell_height = state.cell_height.clone();
@@ -70,6 +70,6 @@ fn update_camera(state: &mut State, config: &Config) -> () {
     if state.cell_height < config.min_cell_height { state.cell_height = config.min_cell_height }
     if state.cell_height > config.max_cell_height { state.cell_height = config.max_cell_height }
 
-    state.camera_position_x += (state.camera_position_x / old_cell_width - state.camera_position_x / state.cell_width + (config.window_width / old_cell_width - config.window_width / state.cell_width) / 2.0) * state.cell_width;
-    state.camera_position_y += (state.camera_position_y / old_cell_height - state.camera_position_y / state.cell_height + (config.window_height / old_cell_height - config.window_height / state.cell_height) / 2.0) * state.cell_height;
+    state.camera_x += (state.camera_x / old_cell_width - state.camera_x / state.cell_width + (config.window_width / old_cell_width - config.window_width / state.cell_width) / 2.0) * state.cell_width;
+    state.camera_y += (state.camera_y / old_cell_height - state.camera_y / state.cell_height + (config.window_height / old_cell_height - config.window_height / state.cell_height) / 2.0) * state.cell_height;
 }

@@ -21,8 +21,8 @@ pub struct State {
     pub cursor_y: i32,
     pub running: bool,
     pub paused: bool,
-    pub camera_position_x: f32,
-    pub camera_position_y: f32,
+    pub camera_x: f32,
+    pub camera_y: f32,
     pub camera_position_z: f32,
     pub camera_x_velocity: f32,
     pub camera_y_velocity: f32,
@@ -46,8 +46,8 @@ impl State {
             cursor_y: 0,
             running: true,
             paused: true,
-            camera_position_x: INITIAL_CAMERA_X,
-            camera_position_y: INITIAL_CAMERA_Y,
+            camera_x: INITIAL_CAMERA_X,
+            camera_y: INITIAL_CAMERA_Y,
             camera_position_z: INITIAL_CAMERA_Z,
             camera_x_velocity: 0.0,
             camera_y_velocity: 0.0,
@@ -67,8 +67,8 @@ impl State {
     }
 
     pub fn reset_camera(&mut self) {
-        self.camera_position_x = INITIAL_CAMERA_X;
-        self.camera_position_y = INITIAL_CAMERA_Y;
+        self.camera_x = INITIAL_CAMERA_X;
+        self.camera_y = INITIAL_CAMERA_Y;
         self.camera_position_z = INITIAL_CAMERA_Z;
         self.cell_width = INITIAL_CELL_WIDTH;
         self.cell_height = INITIAL_CELL_HEIGHT;
@@ -100,6 +100,6 @@ impl State {
 impl fmt::Display for State {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // Use `self.number` to refer to each positional data point.
-        write!(f, "camera_position_x: {}, camera_position_y: {}, cell_width: {}, cell_height: {}", self.camera_position_x, self.camera_position_y, self.cell_width, self.cell_height)
+        write!(f, "camera_x: {}, camera_y: {}, cell_width: {}, cell_height: {}", self.camera_x, self.camera_y, self.cell_width, self.cell_height)
     }
 }
