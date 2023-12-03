@@ -1,6 +1,6 @@
 use sdl2::{keyboard::{self, Keycode}, event::Event};
 
-use crate::{Config, utils, state::State};
+use crate::{Config, utils::{self, lerp}, state::State};
 
 pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config: &Config) -> () {
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) {
@@ -64,8 +64,8 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                 if state.cell_update_interval < 5000.0 { state.cell_update_interval *= 2.0 }
             },
             Event::KeyDown { keycode: Some(Keycode::R), .. } => {
-                state.reset_cell_coords();
-                state.reset_camera_offset();
+                // state.reset_cell_coords();
+                state.reset_camera();
             },
             Event::KeyDown { keycode: Some(Keycode::P), .. } => {
                 for coord in &state.cell_coords {
@@ -74,20 +74,18 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                 }
             },
             Event::KeyDown { keycode: Some(Keycode::C), .. } => {
-                println!("x offset: {}", state.camera_position_x);
-                println!("y offset: {}", state.camera_position_y);
-                println!("cell size: {}", state.cell_width);
-                let center_x = config.window_width as f32 / state.cell_width;
-                println!("center x: {}", center_x);
-                let center_y = config.window_height as f32 / state.cell_height;
-                println!("center y: {}", center_y);
+                let center_coord = utils::game_coord(config.window_width / 2.0, config.window_height / 2.0, state);
+                println!("center coord: {}", center_coord);
             },
             Event::KeyDown { keycode: Some(Keycode::F), .. } => {
                 println!("FPS: {}", state.timestep.frame_rate().unwrap_or(0));
             },
+            Event::KeyDown { keycode: Some(Keycode::D), .. } => {
+                println!("State: {}", state);
+            },
             Event::MouseButtonDown { x, y, .. } => {
-                let coord = utils::screen_coord_to_game_coord(x, y, state);
-                println!("x: {}, y: {}, offset x: {}, offset y: {}, coord: {}", x, y, state.camera_position_x, state.camera_position_y, coord);
+                let coord = utils::game_coord(x as f32, y as f32, state);
+                println!("x: {}, y: {}, coord: {}", x, y, coord);
                 if state.cell_coords.contains(&coord) {
                     state.cell_coords.remove(&coord);
                 } else {

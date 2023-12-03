@@ -60,10 +60,19 @@ fn update_camera(state: &mut State, config: &Config) -> () {
     state.camera_position_x += state.camera_x_velocity;
     state.camera_position_y += state.camera_y_velocity;
 
+    let old_width = config.window_width / state.cell_width;
+    let old_height = config.window_height / state.cell_height;
+
     state.cell_width += state.camera_z_velocity;
     state.cell_height += state.camera_z_velocity;
     if state.cell_width < config.min_cell_width { state.cell_width = config.min_cell_width }
     if state.cell_width > config.max_cell_width { state.cell_width = config.max_cell_width }
     if state.cell_height < config.min_cell_height { state.cell_height = config.min_cell_height }
     if state.cell_height > config.max_cell_height { state.cell_height = config.max_cell_height }
+
+    let new_width = config.window_width / state.cell_width;
+    let new_height = config.window_height / state.cell_height;
+
+    state.camera_position_x -= (old_width - new_width) * state.cell_width / 2.0;
+    state.camera_position_y -= (old_height - new_height) * state.cell_height / 2.0;
 }

@@ -1,11 +1,15 @@
 use crate::{Coord, state::State};
 
-pub fn screen_coord_to_game_coord(x: i32, y: i32, state: &State) -> Coord {
-    let mut x = x + state.camera_position_x.round() as i32;
-    let mut y = y + state.camera_position_y.round() as i32;
-    if x < 0 { x = x - state.cell_width.round() as i32 + 1 }
-    if y < 0 { y = y - state.cell_height.round() as i32 + 1 }
-    x = (x as f32 / state.cell_width.round() as f32) as i32;
-    y = (y as f32 / state.cell_height.round() as f32) as i32;
-    Coord::new(x, y)
+pub fn game_coord(x: f32, y: f32, state: &State) -> Coord {
+    let mut x = x + state.camera_position_x;
+    let mut y = y + state.camera_position_y;
+    if x < 0.0 { x -= state.cell_width }
+    if y < 0.0 { y -= state.cell_height }
+    x /= state.cell_width;
+    y /= state.cell_height;
+    Coord::new(x.floor() as i32, y.floor() as i32)
+}
+
+pub fn lerp(start: f32, end: f32, t: f32) -> f32 {
+    start * (1.0 - t) + end * t
 }

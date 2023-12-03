@@ -1,12 +1,17 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, fmt};
 
 use crate::{Coord, timestep::TimeStep};
 
-const INITIAL_X_OFFSET: f32 = 0.0;
-const INITIAL_Y_OFFSET: f32 = 0.0;
+// const INITIAL_CAMERA_X: f32 = 0.0;
+// const INITIAL_CAMERA_Y: f32 = 0.0;
+const INITIAL_CAMERA_X: f32 = 2394.1008;
+const INITIAL_CAMERA_Y: f32 = 1470.4503;
+const INITIAL_CAMERA_Z: f32 = 1.0;
 const INITIAL_CELL_UPDATE_INTERVAL: f32 = 100.0;
-const INITIAL_CELL_WIDTH: f32 = 10.0;
-const INITIAL_CELL_HEIGHT: f32 = 10.0;
+const INITIAL_CELL_WIDTH: f32 = 100.0;
+const INITIAL_CELL_HEIGHT: f32 = 100.0;
+// const INITIAL_CELL_WIDTH: f32 = 51.321983;
+// const INITIAL_CELL_HEIGHT: f32 = 51.321983;
 
 pub struct State {
     pub cell_coords: HashSet<Coord>,
@@ -18,6 +23,7 @@ pub struct State {
     pub paused: bool,
     pub camera_position_x: f32,
     pub camera_position_y: f32,
+    pub camera_position_z: f32,
     pub camera_x_velocity: f32,
     pub camera_y_velocity: f32,
     pub camera_z_velocity: f32,
@@ -36,12 +42,13 @@ impl State {
             cell_coords: HashSet::new(),
             cell_update_interval: INITIAL_CELL_UPDATE_INTERVAL,
             t_since_last_cell_update: 0.0,
-            camera_position_x: INITIAL_X_OFFSET,
-            camera_position_y: INITIAL_Y_OFFSET,
             cursor_x: 0,
             cursor_y: 0,
             running: true,
-            paused: false,
+            paused: true,
+            camera_position_x: INITIAL_CAMERA_X,
+            camera_position_y: INITIAL_CAMERA_Y,
+            camera_position_z: INITIAL_CAMERA_Z,
             camera_x_velocity: 0.0,
             camera_y_velocity: 0.0,
             camera_z_velocity: 0.0,
@@ -59,9 +66,12 @@ impl State {
         self.cell_coords = HashSet::new();
     }
 
-    pub fn reset_camera_offset(&mut self) {
-        self.camera_position_x = INITIAL_X_OFFSET;
-        self.camera_position_y = INITIAL_Y_OFFSET;
+    pub fn reset_camera(&mut self) {
+        self.camera_position_x = INITIAL_CAMERA_X;
+        self.camera_position_y = INITIAL_CAMERA_Y;
+        self.camera_position_z = INITIAL_CAMERA_Z;
+        self.cell_width = INITIAL_CELL_WIDTH;
+        self.cell_height = INITIAL_CELL_HEIGHT;
     }
 
     pub fn is_live(&self, coord: &Coord) -> bool {
@@ -84,5 +94,12 @@ impl State {
         }
 
         count
+    }
+}
+
+impl fmt::Display for State {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // Use `self.number` to refer to each positional data point.
+        write!(f, "camera_position_x: {}, camera_position_y: {}, cell_width: {}, cell_height: {}", self.camera_position_x, self.camera_position_y, self.cell_width, self.cell_height)
     }
 }
