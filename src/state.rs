@@ -34,6 +34,7 @@ pub struct State {
     pub t: f32,
     pub timestep: TimeStep,
     pub fps: u32,
+    pub font: Option<sdl2::ttf::Font<'static, 'static>>,
 }
 
 impl State {
@@ -63,6 +64,7 @@ impl State {
             t: 0.0,
             timestep: TimeStep::new(),
             fps: 0,
+            font: None
         }
     }
 

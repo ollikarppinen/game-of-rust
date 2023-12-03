@@ -23,7 +23,6 @@ const CAMERA_Z_ACCELERATION: f32 = 0.01;
 const CAMERA_Z_ACCELERATION_MAX: f32 = 0.01;
 const CAMERA_Z_VELOCITY_MAX: f32 = 0.05;
 
-#[derive(Debug)]
 pub struct Config {
     pub window_width: f32,
     pub window_height: f32,
@@ -47,6 +46,7 @@ pub struct Config {
     pub camera_z_acceleration: f32,
     pub camera_z_acceleration_max: f32,
     pub camera_z_velocity_max: f32,
+    pub font: Option<sdl2::ttf::Font<'static, 'static>>,
 }
 
 impl Config {
@@ -74,6 +74,7 @@ impl Config {
             camera_z_acceleration: CAMERA_Z_ACCELERATION,
             camera_z_acceleration_max: CAMERA_Z_ACCELERATION_MAX,
             camera_z_velocity_max: CAMERA_Z_VELOCITY_MAX,
+            font: None,
         }
     }
 }

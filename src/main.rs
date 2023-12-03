@@ -1,5 +1,6 @@
 use config::Config;
 use coord::Coord;
+use once_cell::sync::Lazy;
 
 mod rendering;
 mod inputs;
@@ -14,14 +15,18 @@ fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
 
-    let config = Config::new();
-    let mut  window = video_subsystem.window("game-of-rust", config.window_width as u32, config.window_height as u32)
+    let mut config = Config::new();
+    let window = video_subsystem.window("game-of-rust", config.window_width as u32, config.window_height as u32)
         .position_centered()
         .build()
         .expect("could not initialize video subsystem");
     let mut canvas = window.into_canvas().build()
         .expect("could not make a canvas");
 
+    static ttf_context: Lazy<sdl2::ttf::Sdl2TtfContext> = Lazy::new(|| {
+        sdl2::ttf::init().expect("could not create ttf context")
+    });
+    config.font = Some(ttf_context.load_font(config.font_path, 64)?);
     let mut event_pump: sdl2::EventPump = sdl_context.event_pump()?;
 
     let mut state = state_mgmt::initial_state();

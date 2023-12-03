@@ -23,8 +23,6 @@ pub fn render(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> ()
 
 fn render_intro(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> Result<(), String> {
     let message: String = "Game of Rust".to_string();
-    let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string())?;
-    let font = ttf_context.load_font(config.font_path, 64)?;
     let texture_creator = canvas.texture_creator();
     let mut color = config.font_color.clone();
     color.a = 255;
@@ -32,7 +30,7 @@ fn render_intro(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> 
         let x = (255.0 * ((state.t - config.intro_duration_ms / 2.0) / (config.intro_duration_ms / 2.0))) as u8;
         color.a -= x;
     }
-    let surface = font
+    let surface = config.font.as_ref().unwrap()
         .render(&message)
         .blended(color)
         .map_err(|e| e.to_string())?;
@@ -70,10 +68,8 @@ fn render_message_center(message: &String, canvas: &mut Canvas<Window>, _state: 
 }
 
 fn render_message(message: &String, x: i32, y: i32, canvas: &mut Canvas<Window>, _state: &State, config: &Config) -> Result<(), String> {
-    let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string())?;
-    let font = ttf_context.load_font(config.font_path, 64)?;
     let texture_creator = canvas.texture_creator();
-    let surface = font
+    let surface = config.font.as_ref().unwrap()
         .render(message)
         .blended(config.font_color)
         .map_err(|e| e.to_string())?;
