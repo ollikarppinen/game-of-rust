@@ -20,21 +20,11 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
     }
 
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Z) {
-        if state.camera_z_acceleration > -config.camera_z_acceleration_max {
-            state.camera_z_acceleration = (state.camera_z_acceleration - config.camera_z_acceleration).max(-config.camera_z_acceleration_max)
-        }
-    } else if state.camera_z_acceleration < 0.0 {
-        state.camera_z_acceleration = 0.0;
-        state.camera_z_velocity = 0.0;
-    }
-
-    if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::X) {
-        if state.camera_z_acceleration < config.camera_z_acceleration_max {
-            state.camera_z_acceleration += (state.camera_z_acceleration + config.camera_z_acceleration).min(config.camera_z_acceleration_max)
-        }
-    } else if state.camera_z_acceleration > 0.0 {
-        state.camera_z_acceleration = 0.0;
-        state.camera_z_velocity = 0.0;
+        state.camera_z_i = -1.0
+    } else if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::X) {
+        state.camera_z_i = 1.0
+    } else {
+        state.camera_z_i = 0.0
     }
 
     state.cursor_x = event_pump.mouse_state().x();

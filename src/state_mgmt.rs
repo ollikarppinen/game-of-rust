@@ -82,13 +82,21 @@ pub fn update_camera(state: &mut State, config: &Config) -> () {
     }
     state.camera_y += state.camera_y_velocity * state.camera_y_i;
 
-    state.camera_z_velocity += state.camera_z_acceleration;
+    if state.camera_z_i != 0.0 {
+        if state.camera_z_acceleration < config.camera_xy_acceleration_max {
+            state.camera_z_acceleration = (state.camera_z_acceleration + config.camera_xy_acceleration).min(config.camera_xy_acceleration_max);
+        }
+        state.camera_z_velocity += state.camera_z_acceleration;
+    } else {
+        state.camera_z_acceleration = 0.0;
+        state.camera_z_velocity = 0.0;
+    }
 
     let old_cell_width = state.cell_width.clone();
     let old_cell_height = state.cell_height.clone();
 
-    state.cell_width += state.camera_z_velocity;
-    state.cell_height += state.camera_z_velocity;
+    state.cell_width += state.camera_z_velocity * state.camera_z_i;
+    state.cell_height += state.camera_z_velocity * state.camera_z_i;
     if state.cell_width < config.min_cell_width { state.cell_width = config.min_cell_width }
     if state.cell_width > config.max_cell_width { state.cell_width = config.max_cell_width }
     if state.cell_height < config.min_cell_height { state.cell_height = config.min_cell_height }
