@@ -64,7 +64,9 @@ pub fn update_camera(state: &mut State, config: &Config) -> () {
         if state.camera_x_acceleration < config.camera_xy_acceleration_max {
             state.camera_x_acceleration = (state.camera_x_acceleration + config.camera_xy_acceleration).min(config.camera_xy_acceleration_max);
         }
-        state.camera_x_velocity += state.camera_x_acceleration;
+        if state.camera_x_velocity < config.camera_xy_velocity_max {
+            state.camera_x_velocity = (state.camera_x_velocity + state.camera_x_acceleration).min(config.camera_xy_velocity_max);
+        }
     } else {
         state.camera_x_acceleration = 0.0;
         state.camera_x_velocity = 0.0;
@@ -75,7 +77,9 @@ pub fn update_camera(state: &mut State, config: &Config) -> () {
         if state.camera_y_acceleration < config.camera_xy_acceleration_max {
             state.camera_y_acceleration = (state.camera_y_acceleration + config.camera_xy_acceleration).min(config.camera_xy_acceleration_max);
         }
-        state.camera_y_velocity += state.camera_y_acceleration;
+        if state.camera_y_velocity < config.camera_xy_velocity_max {
+            state.camera_y_velocity = (state.camera_y_velocity + state.camera_y_acceleration).min(config.camera_xy_velocity_max);
+        }
     } else {
         state.camera_y_acceleration = 0.0;
         state.camera_y_velocity = 0.0;
