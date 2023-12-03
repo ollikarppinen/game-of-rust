@@ -107,36 +107,22 @@ fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
     canvas.set_draw_color(color);
     canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
 
-    let coord = utils::screen_coord_to_game_coord(0, 0, state);
-    let mut x = coord.x * state.cell_width.round() as i32 - state.camera_position_x.round() as i32;
-    let mut y = coord.y * state.cell_height.round() as i32 - state.camera_position_y.round() as i32;
+    let dx: i32 = state.cell_width as i32;
+    let dy: i32 = state.cell_height as i32;
+    let mut x: i32 = state.camera_position_x.round() as i32 % dx;
+    let mut y: i32 = state.camera_position_y.round() as i32 % dy;
+    if x < 0 { x *= -1 } else { x = dx - x }
+    if y < 0 { y *= -1 } else { y = dy - y  }
+    let max_x = config.window_width.round() as i32;
+    let max_y = config.window_height.round() as i32;
 
-    while x < config.window_width as i32 {
-        canvas.draw_line(
-            Point::new(
-                x,
-                0
-            ),
-            Point::new(
-                x,
-                config.window_height as i32
-            )
-        ).expect("could not draw line");
-        x += state.cell_width.round() as i32;
+    while x < max_x {
+        canvas.draw_line(Point::new(x, 0), Point::new(x, max_y)).expect("could not draw line");
+        x += dx;
     }
-    while y < config.window_height.round() as i32 {
-        canvas.draw_line(
-            Point::new(
-                0,
-                y
-            ),
-            Point::new(
-                config.window_width.round() as i32,
-                y
-            )
-        ).expect("could not draw line");
-
-        y += state.cell_height.round() as i32;
+    while y < max_y {
+        canvas.draw_line(Point::new(0, y), Point::new(max_x, y)).expect("could not draw line");
+        y += dy;
     }
 }
 
