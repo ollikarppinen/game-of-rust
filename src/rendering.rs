@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 use sdl2::rect::{Rect, Point};
 use sdl2::{render::Canvas, pixels::Color};
 use sdl2::video::Window;
@@ -130,19 +128,12 @@ fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
 }
 
 fn render_state(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
-    let mut y= 0.0;
-    let y_max = config.window_height + state.cell_height;
-    let x_max = config.window_width + state.cell_width;
-    while y < y_max {
-        let mut x = 0.0;
-        while x < x_max {
-            let coord = utils::game_coord(x, y, state);
-            if state.cell_coords.contains(&coord) {
-                render_cell(canvas, state, &coord, config.cell_color);
-            }
-            x += state.cell_width;
+    for cell_coord in state.cell_coords.iter() {
+        let cell_wx = cell_coord.x as f32 * state.cell_width - state.camera_x;
+        let cell_wy = cell_coord.y as f32 * state.cell_height - state.camera_y;
+        if cell_wx > -state.cell_width && cell_wx < config.window_width && cell_wy > -state.cell_height && cell_wy < config.window_height {
+            render_cell(canvas, state, &cell_coord, config.cell_color);
         }
-        y += state.cell_height;
     }
 }
 
