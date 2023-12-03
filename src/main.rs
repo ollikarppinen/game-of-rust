@@ -15,7 +15,7 @@ fn main() -> Result<(), String> {
     let video_subsystem = sdl_context.video()?;
 
     let config = Config::new();
-    let window = video_subsystem.window("game-of-rust", config.window_width as u32, config.window_height as u32)
+    let mut  window = video_subsystem.window("game-of-rust", config.window_width as u32, config.window_height as u32)
         .position_centered()
         .build()
         .expect("could not initialize video subsystem");
@@ -32,9 +32,11 @@ fn main() -> Result<(), String> {
     while state.running {
         let frame_time = state.timestep.delta();
         accumulator += frame_time;
+        inputs::handle_inputs(&mut state, &mut event_pump, &config);
+        state_mgmt::update_fps(&mut state, &config);
+        state_mgmt::update_camera(&mut state, &config);
 
         while accumulator >= config.dt {
-            inputs::handle_inputs(&mut state, &mut event_pump, &config);
             state_mgmt::update(&mut state, &config);
             state.t += config.dt;
             accumulator -= config.dt;

@@ -29,8 +29,14 @@ pub fn initial_state() -> State {
 }
 
 pub fn update(state: &mut State, config: &Config) -> () {
-    update_camera(state, config);
     update_cells(state, config);
+}
+
+pub fn update_fps(state: &mut State, config: &Config) -> () {
+    match state.timestep.frame_rate() {
+        Some(fps) => { state.fps = fps },
+        None => {}
+    }
 }
 
 fn update_cells(state: &mut State, config: &Config) -> () {
@@ -53,7 +59,7 @@ fn update_cells(state: &mut State, config: &Config) -> () {
     state.cell_coords = new_cell_coords;
 }
 
-fn update_camera(state: &mut State, config: &Config) -> () {
+pub fn update_camera(state: &mut State, config: &Config) -> () {
     state.camera_x_velocity += state.camera_x_acceleration;
     state.camera_y_velocity += state.camera_y_acceleration;
     state.camera_z_velocity += state.camera_z_acceleration;

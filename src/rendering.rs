@@ -1,3 +1,5 @@
+use std::fmt::format;
+
 use sdl2::rect::{Rect, Point};
 use sdl2::{render::Canvas, pixels::Color};
 use sdl2::video::Window;
@@ -13,6 +15,7 @@ pub fn render(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> ()
     render_hover(canvas, &state, &config);
     render_state(canvas, &state, &config);
     render_grid(canvas, &state, &config);
+    render_fps(canvas, &state, &config);
 
     if state.t < config.intro_duration_ms { let _ = render_intro(canvas, &state, &config); }
     if state.paused { render_paused(canvas, &state, &config) }
@@ -159,4 +162,8 @@ fn render_cell(canvas: &mut Canvas<Window>, state: &State, coord: &Coord, color:
     let y = coord.y as f32 * state.cell_height - state.camera_y;
     canvas.set_draw_color(color);
     canvas.fill_rect(Rect::new(x.ceil() as i32, y.ceil() as i32, state.cell_width.ceil() as u32, state.cell_height.ceil() as u32)).expect("could not fill rect");
+}
+
+fn render_fps(canvas: &mut Canvas<Window>, state: &State, _config: &Config) {
+    let _ = canvas.window_mut().set_title(&format!("game-of-rust, FPS: {}", state.fps));
 }

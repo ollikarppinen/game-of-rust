@@ -77,7 +77,6 @@ pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config
                 if state.cell_update_interval < 5000.0 { state.cell_update_interval *= 2.0 }
             },
             Event::KeyDown { keycode: Some(Keycode::R), .. } => {
-                // state.reset_cell_coords();
                 state.reset_camera();
             },
             Event::KeyDown { keycode: Some(Keycode::P), .. } => {
