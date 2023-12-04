@@ -48,6 +48,13 @@ fn update_cells(state: &mut State, config: &Config) -> () {
 
     let mut new_cell_coords = HashSet::new();
 
+    // TODO: parallelize loop?
+    // state.cell_coords.iter().for_each(|c| {
+    //     if state.should_live(&c) { new_cell_coords.insert(c.clone()); }
+    //     c.neighbors().iter().for_each(|c| {
+    //         if state.should_live(&c) { new_cell_coords.insert(c.clone()); }
+    //     });
+    // });
     for cell_coord in &state.cell_coords {
         if state.should_live(&cell_coord) { new_cell_coords.insert(cell_coord.clone()); }
         for neighbor_coord in cell_coord.neighbors() {

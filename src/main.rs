@@ -34,7 +34,17 @@ fn main() -> Result<(), String> {
 
     // let mut state = state_mgmt::initial_state();
     let mut state = State::new();
-    rle::load_pattern("./patterns/p82pihassler.rle", &mut state, 15, 5);
+    /*
+    patterns:
+    p960_2c5gun
+    60P5H2V0
+    otcametapixel
+    gosperguninlineinverter
+    p82pihassler
+    simkinglidergunboatbitvariant
+    twogun
+     */
+    rle::load_pattern("./patterns/p960_2c5gun.rle", &mut state, 15, 5);
 
     // https://gafferongames.com/post/fix_your_timestep/
     let mut accumulator = 0.0;
