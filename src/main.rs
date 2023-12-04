@@ -2,6 +2,8 @@ use config::Config;
 use coord::Coord;
 use once_cell::sync::Lazy;
 
+use crate::state::State;
+
 mod rendering;
 mod inputs;
 mod state_mgmt;
@@ -10,6 +12,7 @@ mod state;
 mod config;
 mod timestep;
 mod coord;
+mod rle;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -29,7 +32,9 @@ fn main() -> Result<(), String> {
     config.font = Some(ttf_context.load_font(config.font_path, 64)?);
     let mut event_pump: sdl2::EventPump = sdl_context.event_pump()?;
 
-    let mut state = state_mgmt::initial_state();
+    // let mut state = state_mgmt::initial_state();
+    let mut state = State::new();
+    rle::load_pattern("./patterns/p82pihassler.rle", &mut state, 15, 5);
 
     // https://gafferongames.com/post/fix_your_timestep/
     let mut accumulator = 0.0;
