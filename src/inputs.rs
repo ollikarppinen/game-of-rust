@@ -1,6 +1,6 @@
 use sdl2::{keyboard::{self, Keycode}, event::Event};
 
-use crate::{Config, utils::{self}, state::State};
+use crate::{utils, state::State, config::Config};
 
 pub fn handle_inputs(state: &mut State, event_pump: &mut sdl2::EventPump, config: &Config) -> () {
     if event_pump.keyboard_state().is_scancode_pressed(keyboard::Scancode::Down) {

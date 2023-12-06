@@ -1,6 +1,6 @@
 use std::{collections::HashSet, fmt};
 
-use crate::{Coord, timestep::TimeStep};
+use crate::{timestep::TimeStep, coord::Coord};
 
 const INITIAL_CAMERA_X: f32 = 0.0;
 const INITIAL_CAMERA_Y: f32 = 0.0;

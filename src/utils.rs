@@ -1,4 +1,4 @@
-use crate::{Coord, state::State};
+use crate::{state::State, coord::Coord};
 
 pub fn game_coord(x: f32, y: f32, state: &State) -> Coord {
     let mut x = x + state.camera_x;

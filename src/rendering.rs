@@ -1,9 +1,11 @@
 use sdl2::rect::{Rect, Point};
 use sdl2::{render::Canvas, pixels::Color};
 use sdl2::video::Window;
+
+use crate::config::Config;
+use crate::coord::Coord;
 use crate::state::State;
-use crate::{Coord, utils};
-use crate::Config;
+use crate::utils;
 
 pub fn render(canvas: &mut Canvas<Window>, state: &State, config: &Config) -> () {
     let color = config.background_color;
