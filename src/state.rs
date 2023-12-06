@@ -46,7 +46,7 @@ impl State {
             cursor_x: 0,
             cursor_y: 0,
             running: true,
-            paused: true,
+            paused: false,
             camera_x: INITIAL_CAMERA_X,
             camera_y: INITIAL_CAMERA_Y,
             camera_z: INITIAL_CAMERA_Z,
