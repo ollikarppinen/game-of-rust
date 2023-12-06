@@ -19,9 +19,9 @@ const HOVER_COLOR: Color = Color::GREY;
 const CAMERA_XY_ACCELERATION: f32 = 0.1;
 const CAMERA_XY_ACCELERATION_MAX: f32 = 1.0;
 const CAMERA_XY_VELOCITY_MAX: f32 = 50.0;
-const CAMERA_Z_ACCELERATION: f32 = 0.01;
+const CAMERA_Z_ACCELERATION: f32 = 0.001;
 const CAMERA_Z_ACCELERATION_MAX: f32 = 0.01;
-const CAMERA_Z_VELOCITY_MAX: f32 = 0.05;
+const CAMERA_Z_VELOCITY_MAX: f32 = 0.1;
 
 pub struct Config {
     pub window_width: f32,
