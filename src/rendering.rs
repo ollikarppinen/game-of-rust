@@ -126,13 +126,23 @@ fn render_grid(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
 }
 
 fn render_state(canvas: &mut Canvas<Window>, state: &State, config: &Config) {
+    let mut rects: Vec<Rect> = Vec::new();
     for cell_coord in state.cell_coords.iter() {
         let cell_wx = cell_coord.x as f32 * state.cell_width - state.camera_x;
         let cell_wy = cell_coord.y as f32 * state.cell_height - state.camera_y;
         if cell_wx > -state.cell_width && cell_wx < config.window_width && cell_wy > -state.cell_height && cell_wy < config.window_height {
-            render_cell(canvas, state, &cell_coord, config.cell_color);
+            rects.push(
+                Rect::new(
+                    cell_wx.ceil() as i32,
+                    cell_wy.ceil() as i32,
+                    state.cell_width.ceil() as u32,
+                    state.cell_height.ceil() as u32
+                )
+            );
         }
     }
+    canvas.set_draw_color(config.cell_color);
+    let _ =  canvas.fill_rects(&rects);
 }
 
 fn render_hover(canvas: &mut Canvas<Window>, state: &State, config: &Config) {

@@ -2,12 +2,12 @@ use std::{collections::HashSet, fmt};
 
 use crate::{timestep::TimeStep, coord::Coord};
 
-const INITIAL_CAMERA_X: f32 = 0.0;
-const INITIAL_CAMERA_Y: f32 = 0.0;
+const INITIAL_CAMERA_X: f32 = 390.0;
+const INITIAL_CAMERA_Y: f32 = 390.0;
 const INITIAL_CAMERA_Z: f32 = 1.0;
-const INITIAL_CELL_UPDATE_INTERVAL: f32 = 100.0;
-const INITIAL_CELL_WIDTH: f32 = 10.0;
-const INITIAL_CELL_HEIGHT: f32 = 10.0;
+const INITIAL_CELL_UPDATE_INTERVAL: f32 = 20.0;
+const INITIAL_CELL_WIDTH: f32 = 1.0;
+const INITIAL_CELL_HEIGHT: f32 = 1.0;
 
 pub struct State {
     pub cell_coords: HashSet<Coord>,

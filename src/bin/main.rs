@@ -31,7 +31,7 @@ fn main() -> Result<(), String> {
     simkinglidergunboatbitvariant
     twogun
      */
-    rle::load_pattern("./patterns/p82pihassler.rle", &mut state, 0, 0);
+    rle::load_pattern("./patterns/p960_2c5gun.rle", &mut state, 0, 0);
 
     // https://gafferongames.com/post/fix_your_timestep/
     let mut accumulator = 0.0;
